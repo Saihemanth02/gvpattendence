@@ -14,16 +14,153 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance_entries: {
+        Row: {
+          id: string
+          record_id: string
+          status: string
+          student_suffix: string
+        }
+        Insert: {
+          id?: string
+          record_id: string
+          status: string
+          student_suffix: string
+        }
+        Update: {
+          id?: string
+          record_id?: string
+          status?: string
+          student_suffix?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_entries_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "attendance_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance_records: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          period: number
+          section: string
+          subject: string
+          submitted_by: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          period: number
+          section: string
+          subject: string
+          submitted_by: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          period?: number
+          section?: string
+          subject?: string
+          submitted_by?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      students: {
+        Row: {
+          id: string
+          name: string
+          reg_number: string
+          suffix: string
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          reg_number: string
+          suffix: string
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          reg_number?: string
+          suffix?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "faculty" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +287,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["faculty", "student"],
+    },
   },
 } as const
