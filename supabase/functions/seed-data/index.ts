@@ -98,7 +98,7 @@ serve(async (req) => {
 
     // 2. Create student users and seed students table
     for (const s of STUDENTS) {
-      const email = `${s.suffix}@edutrack.student`;
+      const email = `${s.suffix}@gvp.student`;
       
       const { data: studentUser, error: studentErr } = await supabaseAdmin.auth.admin.createUser({
         email,

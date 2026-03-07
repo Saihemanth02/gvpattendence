@@ -84,8 +84,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (username: string, password: string, role: 'faculty' | 'student') => {
     const email = role === 'faculty'
-      ? `${username}@edutrack.faculty`
-      : `${username}@edutrack.student`;
+      ? `${username}@gvp.faculty`
+      : `${username}@gvp.student`;
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
