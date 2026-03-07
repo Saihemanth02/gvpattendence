@@ -22,7 +22,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       await login(username, password, role);
-      toast.success('Welcome to EduTrack Pro!');
+      toast.success('Welcome to GVP!');
     } catch {
       toast.error('Invalid credentials. Please try again.');
     } finally {

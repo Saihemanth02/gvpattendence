@@ -80,7 +80,7 @@ serve(async (req) => {
 
     // 1. Create faculty user
     const { data: facultyUser, error: facultyErr } = await supabaseAdmin.auth.admin.createUser({
-      email: "admin@edutrack.faculty",
+      email: "admin@gvp.faculty",
       password: "admin123",
       email_confirm: true,
       user_metadata: { username: "admin", display_name: "Admin Faculty", role: "faculty" },
@@ -98,7 +98,7 @@ serve(async (req) => {
 
     // 2. Create student users and seed students table
     for (const s of STUDENTS) {
-      const email = `${s.suffix}@edutrack.student`;
+      const email = `${s.suffix}@gvp.student`;
       
       const { data: studentUser, error: studentErr } = await supabaseAdmin.auth.admin.createUser({
         email,
