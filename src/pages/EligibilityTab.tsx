@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useStudents } from '@/hooks/useStudents';
-import { useAttendance } from '@/hooks/useAttendance';
+import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, Filter } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,15 +9,16 @@ const SUBJECT_THRESHOLD = 65;
 const OVERALL_THRESHOLD = 75;
 
 const EligibilityTab = () => {
-  const { students } = useStudents();
-  const { records, entries } = useAttendance();
+  const { data: students } = useStudents();
+  const { data: records } = useAttendanceRecords();
+  const recordIds = useMemo(() => records?.map(r => r.id), [records]);
+  const { data: entries } = useAttendanceEntries(recordIds);
   const [filterStatus, setFilterStatus] = useState<'all' | 'eligible' | 'not-eligible'>('all');
 
   const eligibilityData = useMemo(() => {
     if (!students?.length || !records?.length || !entries?.length) return [];
 
     return students.map(student => {
-      // Group records by subject
       const subjectMap: Record<string, { total: number; present: number }> = {};
       let totalClasses = 0;
       let totalPresent = 0;
@@ -106,7 +107,7 @@ const EligibilityTab = () => {
       {/* Filter */}
       <div className="flex items-center gap-2">
         <Filter className="w-4 h-4 text-muted-foreground" />
-        <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as any)}>
+        <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as 'all' | 'eligible' | 'not-eligible')}>
           <SelectTrigger className="w-48 glass-card border-primary/20">
             <SelectValue />
           </SelectTrigger>

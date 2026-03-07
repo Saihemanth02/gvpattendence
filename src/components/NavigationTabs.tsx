@@ -18,6 +18,7 @@ const NavigationTabs = ({ activeTab, onTabChange }: NavigationTabsProps) => {
     { id: 'students', label: 'Students', icon: <Users className="w-4 h-4" /> },
     { id: 'history', label: 'History', icon: <History className="w-4 h-4" /> },
     { id: 'weekly', label: 'Weekly View', icon: <CalendarDays className="w-4 h-4" /> },
+    { id: 'eligibility', label: 'Eligibility', icon: <ShieldCheck className="w-4 h-4" /> },
   ];
 
   const visibleTabs = tabs.filter(t => !t.facultyOnly || user?.role === 'faculty');

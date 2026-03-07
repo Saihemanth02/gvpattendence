@@ -42,6 +42,7 @@ const Index = () => {
       case 'students': return <StudentsTab />;
       case 'history': return <HistoryTab />;
       case 'weekly': return <WeeklyViewTab />;
+      case 'eligibility': return <EligibilityTab />;
       default: return <DashboardTab />;
     }
   };
