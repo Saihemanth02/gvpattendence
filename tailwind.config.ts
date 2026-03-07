@@ -68,6 +68,7 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
       fontFamily: {
         cinzel: ["Cinzel", "serif"],
         cormorant: ["Cormorant Garamond", "serif"],
