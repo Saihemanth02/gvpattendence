@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
+const SplashScreen = ({ onComplete }: {onComplete: () => void;}) => {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
         </div>
       </div>
       <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-primary mb-2 tracking-widest">
-        EduTrack Pro
+        Gayatri Vidya Parishad  
       </h1>
       <p className="text-muted-foreground text-sm tracking-[0.3em] mb-8 font-cormorant">
         ATTENDANCE MANAGEMENT SYSTEM
@@ -30,8 +30,8 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
       <div className="w-64 h-1 bg-secondary rounded-full overflow-hidden">
         <div className="h-full bg-gradient-to-r from-gold-dark via-primary to-gold-light animate-progress rounded-full" />
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SplashScreen;
