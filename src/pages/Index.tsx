@@ -10,6 +10,7 @@ import MarkAttendanceTab from '@/pages/MarkAttendanceTab';
 import StudentsTab from '@/pages/StudentsTab';
 import HistoryTab from '@/pages/HistoryTab';
 import WeeklyViewTab from '@/pages/WeeklyViewTab';
+import EligibilityTab from '@/pages/EligibilityTab';
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -41,6 +42,7 @@ const Index = () => {
       case 'students': return <StudentsTab />;
       case 'history': return <HistoryTab />;
       case 'weekly': return <WeeklyViewTab />;
+      case 'eligibility': return <EligibilityTab />;
       default: return <DashboardTab />;
     }
   };
