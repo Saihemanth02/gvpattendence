@@ -46,11 +46,11 @@ const LoginPage = () => {
                 const el = e.target as HTMLImageElement;
                 el.style.display = 'none';
                 el.parentElement!.querySelector('.fallback-emblem')?.classList.remove('hidden');
-              }}
-            />
+              }} />
+            
             <span className="fallback-emblem hidden text-5xl text-primary animate-pulse-gold absolute inset-0 flex items-center justify-center">⚜</span>
           </div>
-          <h1 className="font-cinzel text-3xl font-bold text-primary tracking-wider">EduTrack Pro</h1>
+          <h1 className="font-cinzel text-3xl font-bold text-primary tracking-wider">Gayatri vidya parishad </h1>
           <p className="text-[11px] tracking-[0.3em] text-muted-foreground mt-1">ROYAL ATTENDANCE MANAGEMENT</p>
         </div>
 
@@ -58,20 +58,20 @@ const LoginPage = () => {
         <div className="glass-card p-6 md:p-8">
           {/* Role Tabs */}
           <div className="flex mb-6 bg-secondary/30 rounded-lg p-1">
-            {(['faculty', 'student'] as const).map(r => (
-              <button
-                key={r}
-                onClick={() => { setRole(r); setUsername(''); }}
-                className={cn(
-                  "flex-1 py-2 rounded-md text-sm font-cinzel transition-all capitalize",
-                  role === r
-                    ? "bg-primary/15 text-primary border border-primary/30"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
+            {(['faculty', 'student'] as const).map((r) =>
+            <button
+              key={r}
+              onClick={() => {setRole(r);setUsername('');}}
+              className={cn(
+                "flex-1 py-2 rounded-md text-sm font-cinzel transition-all capitalize",
+                role === r ?
+                "bg-primary/15 text-primary border border-primary/30" :
+                "text-muted-foreground hover:text-foreground"
+              )}>
+              
                 {r}
               </button>
-            ))}
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -82,10 +82,10 @@ const LoginPage = () => {
               <input
                 type="text"
                 value={username}
-                onChange={e => setUsername(e.target.value)}
+                onChange={(e) => setUsername(e.target.value)}
                 placeholder={role === 'faculty' ? 'admin' : '002'}
-                className="w-full bg-input/50 border border-border/50 rounded-md px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors"
-              />
+                className="w-full bg-input/50 border border-border/50 rounded-md px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors" />
+              
             </div>
 
             <div className="relative">
@@ -93,15 +93,15 @@ const LoginPage = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-input/50 border border-border/50 rounded-md px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors pr-10"
-              />
+                className="w-full bg-input/50 border border-border/50 rounded-md px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors pr-10" />
+              
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground"
-              >
+                className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground">
+                
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
@@ -109,26 +109,26 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-md bg-gradient-to-r from-gold-dark via-primary to-gold-light text-primary-foreground font-cinzel font-bold tracking-wider hover:shadow-[0_0_20px_hsla(42,88%,55%,0.3)] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-              ) : (
-                <>
+              className="w-full py-3 rounded-md bg-gradient-to-r from-gold-dark via-primary to-gold-light text-primary-foreground font-cinzel font-bold tracking-wider hover:shadow-[0_0_20px_hsla(42,88%,55%,0.3)] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              
+              {loading ?
+              <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> :
+
+              <>
                   <LogIn className="w-4 h-4" />
                   Enter the System
                 </>
-              )}
+              }
             </button>
           </form>
 
           <p className="text-[10px] text-muted-foreground/60 text-center mt-4 font-cormorant leading-relaxed">
-            Faculty: admin / admin123 &nbsp;|&nbsp; Student: use Roll suffix, password: student123
+            Student: use Roll suffix, password: student123
           </p>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default LoginPage;
