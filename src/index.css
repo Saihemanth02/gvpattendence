@@ -68,6 +68,12 @@
   }
 }
 
+@media (min-width: 768px) {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+}
+
 /* Gold grid overlay */
 .gold-grid-bg {
   background-image:
