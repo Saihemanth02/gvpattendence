@@ -12,12 +12,12 @@ const AppHeader = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const initials = user?.displayName
-    ?.split(' ')
-    .map(n => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase() || '?';
+  const initials = user?.displayName?.
+  split(' ').
+  map((n) => n[0]).
+  join('').
+  slice(0, 2).
+  toUpperCase() || '?';
 
   return (
     <header className="glass-card border-b border-border/50 px-4 md:px-6 py-3 flex items-center justify-between relative z-10">
@@ -28,11 +28,11 @@ const AppHeader = () => {
           className="w-10 h-10 rounded-full object-cover border border-primary/30"
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = 'none';
-          }}
-        />
+          }} />
+        
         <div>
           <h1 className="font-cinzel text-lg md:text-xl font-bold text-primary leading-tight">
-            EduTrack Pro
+            GVP DASHBOARD  
           </h1>
           <p className="text-[10px] tracking-[0.2em] text-muted-foreground hidden md:block">
             ATTENDANCE MANAGEMENT SYSTEM
@@ -59,14 +59,14 @@ const AppHeader = () => {
         </div>
         <button
           onClick={logout}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-md border border-primary/30 text-primary text-xs hover:bg-primary/10 transition-colors font-cinzel"
-        >
+          className="flex items-center gap-1 px-3 py-1.5 rounded-md border border-primary/30 text-primary text-xs hover:bg-primary/10 transition-colors font-cinzel">
+          
           <LogOut className="w-3 h-3" />
           <span className="hidden md:inline">Logout</span>
         </button>
       </div>
-    </header>
-  );
+    </header>);
+
 };
 
 export default AppHeader;
