@@ -80,6 +80,31 @@ const EligibilityTab = () => {
   const eligibleCount = withData.filter(s => s.isEligible).length;
   const notEligibleCount = withData.length - eligibleCount;
 
+  const exportCSV = () => {
+    if (!filtered.length) return;
+    const subjects = [...new Set(filtered.flatMap(s => s.subjects.map(sub => sub.name)))].sort();
+    const headers = ['Reg Number', 'Name', 'Suffix', 'Overall %', ...subjects.map(s => `${s} %`), 'Status'];
+    const rows = filtered.map(s => [
+      s.reg_number,
+      s.name,
+      s.suffix,
+      s.overallPercent.toFixed(1),
+      ...subjects.map(subName => {
+        const sub = s.subjects.find(x => x.name === subName);
+        return sub ? sub.percent.toFixed(1) : '0.0';
+      }),
+      s.isEligible ? 'Eligible' : 'Not Eligible',
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `eligibility-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Summary Cards */}
