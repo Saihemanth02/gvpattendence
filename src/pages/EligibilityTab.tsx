@@ -76,8 +76,8 @@ const EligibilityTab = () => {
     return withData;
   }, [withData, filterStatus]);
 
-  const eligibleCount = eligibilityData.filter(s => s.isEligible).length;
-  const notEligibleCount = eligibilityData.length - eligibleCount;
+  const eligibleCount = withData.filter(s => s.isEligible).length;
+  const notEligibleCount = withData.length - eligibleCount;
 
   return (
     <div className="p-4 md:p-6 space-y-6">
