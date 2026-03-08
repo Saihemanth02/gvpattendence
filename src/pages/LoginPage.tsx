@@ -33,33 +33,33 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center gold-grid-bg relative overflow-hidden">
       <FloatingOrbs />
-      <div className="animate-fade-in-up relative z-10 w-full max-w-md mx-4">
+      <div className="animate-fade-in-up relative z-10 w-full max-w-md md:max-w-lg mx-4">
         {/* Logo */}
-        <div className="flex flex-col items-center mb-8 w-full pt-4 md:pt-8">
-          <div className="relative mb-6">
-            <div className="w-28 h-28 rounded-full border-2 border-primary/30 animate-rotate-ring absolute -inset-2" />
+        <div className="flex flex-col items-center mb-10 md:mb-14 w-full pt-4 md:pt-10">
+          <div className="relative mb-8 md:mb-10">
+            <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-primary/30 animate-rotate-ring absolute -inset-2" />
             <img
               src="/gvplogo.jpg"
               alt="GVP Logo"
-              className="w-24 h-24 rounded-full object-cover animate-pulse-gold"
+              className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover animate-pulse-gold"
               onError={(e) => {
                 const el = e.target as HTMLImageElement;
                 el.style.display = 'none';
                 el.parentElement!.querySelector('.fallback-emblem')?.classList.remove('hidden');
               }} />
             
-            <span className="fallback-emblem hidden text-5xl text-primary animate-pulse-gold absolute inset-0 flex items-center justify-center">⚜</span>
+            <span className="fallback-emblem hidden text-5xl md:text-6xl text-primary animate-pulse-gold absolute inset-0 flex items-center justify-center">⚜</span>
           </div>
-          <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-primary tracking-wider text-center leading-tight mt-2">
+          <h1 className="font-cinzel text-3xl md:text-5xl font-bold text-primary tracking-wider text-center leading-tight mt-2">
             Gayatri vidya parishad
           </h1>
-          <p className="text-[11px] tracking-[0.3em] text-muted-foreground mt-2 text-center">
+          <p className="text-[11px] md:text-sm tracking-[0.3em] text-muted-foreground mt-3 md:mt-4 text-center">
             ROYAL ATTENDANCE MANAGEMENT
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="glass-card p-6 md:p-8">
+        <div className="glass-card p-6 md:p-10">
           {/* Role Tabs */}
           <div className="flex mb-6 bg-secondary/30 rounded-lg p-1">
             {(['faculty', 'student'] as const).map((r) =>
