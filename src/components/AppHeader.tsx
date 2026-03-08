@@ -49,7 +49,14 @@ const AppHeader = () => {
         </span>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 md:gap-3">
+        <button
+          onClick={toggleTheme}
+          className="w-8 h-8 rounded-md border border-primary/30 flex items-center justify-center text-primary hover:bg-primary/10 transition-colors"
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+        </button>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
             <span className="text-xs font-cinzel font-bold text-primary">{initials}</span>
