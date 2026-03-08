@@ -68,14 +68,16 @@ const EligibilityTab = () => {
     });
   }, [students, records, entries]);
 
-  const filtered = useMemo(() => {
-    if (filterStatus === 'eligible') return eligibilityData.filter(s => s.isEligible);
-    if (filterStatus === 'not-eligible') return eligibilityData.filter(s => !s.isEligible);
-    return eligibilityData;
-  }, [eligibilityData, filterStatus]);
+  const withData = useMemo(() => eligibilityData.filter(s => s.totalClasses > 0), [eligibilityData]);
 
-  const eligibleCount = eligibilityData.filter(s => s.isEligible).length;
-  const notEligibleCount = eligibilityData.length - eligibleCount;
+  const filtered = useMemo(() => {
+    if (filterStatus === 'eligible') return withData.filter(s => s.isEligible);
+    if (filterStatus === 'not-eligible') return withData.filter(s => !s.isEligible);
+    return withData;
+  }, [withData, filterStatus]);
+
+  const eligibleCount = withData.filter(s => s.isEligible).length;
+  const notEligibleCount = withData.length - eligibleCount;
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -83,7 +85,7 @@ const EligibilityTab = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="glass-card p-4 rounded-lg text-center">
           <p className="text-muted-foreground text-sm font-cormorant">Total Students</p>
-          <p className="text-3xl font-bold font-cinzel text-primary">{eligibilityData.length}</p>
+          <p className="text-3xl font-bold font-cinzel text-primary">{withData.length}</p>
         </div>
         <div className="glass-card p-4 rounded-lg text-center">
           <p className="text-muted-foreground text-sm font-cormorant">Eligible</p>
