@@ -132,19 +132,31 @@ const EligibilityTab = () => {
         </div>
       </div>
 
-      {/* Filter */}
-      <div className="flex items-center gap-2">
-        <Filter className="w-4 h-4 text-muted-foreground" />
-        <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as 'all' | 'eligible' | 'not-eligible')}>
-          <SelectTrigger className="w-48 glass-card border-primary/20">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Students</SelectItem>
-            <SelectItem value="eligible">Eligible Only</SelectItem>
-            <SelectItem value="not-eligible">Not Eligible Only</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Filter & Export */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as 'all' | 'eligible' | 'not-eligible')}>
+            <SelectTrigger className="w-48 glass-card border-primary/20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Students</SelectItem>
+              <SelectItem value="eligible">Eligible Only</SelectItem>
+              <SelectItem value="not-eligible">Not Eligible Only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button
+          onClick={exportCSV}
+          variant="outline"
+          size="sm"
+          className="border-primary/30 text-primary hover:bg-primary/10 font-cinzel"
+          disabled={filtered.length === 0}
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export CSV
+        </Button>
       </div>
 
       {/* Student List */}
