@@ -1,5 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, Clock } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { LogOut, Clock, Sun, Moon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
