@@ -6,6 +6,7 @@ import FloatingOrbs from '@/components/FloatingOrbs';
 import SparkleCanvas from '@/components/SparkleCanvas';
 import AppHeader from '@/components/AppHeader';
 import NavigationTabs, { type TabId } from '@/components/NavigationTabs';
+import MobileBottomNav from '@/components/MobileBottomNav';
 import DashboardTab from '@/pages/DashboardTab';
 import MarkAttendanceTab from '@/pages/MarkAttendanceTab';
 import StudentsTab from '@/pages/StudentsTab';
