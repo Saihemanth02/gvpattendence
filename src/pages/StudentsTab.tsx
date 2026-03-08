@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useStudents } from '@/hooks/useStudents';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search } from 'lucide-react';
+import { Search, Users, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -13,10 +13,12 @@ const StudentsTab = () => {
   const recordIds = records?.map(r => r.id) || [];
   const { data: entries } = useAttendanceEntries(recordIds);
   const [search, setSearch] = useState('');
+  const [sortField, setSortField] = useState<'name' | 'pct'>('name');
+  const [sortAsc, setSortAsc] = useState(true);
 
   const studentStats = useMemo(() => {
     if (!students || !entries) return [];
-    return students
+    const list = students
       .filter(s => {
         if (user?.role === 'student' && s.suffix !== user.suffix) return false;
         if (!search) return true;
@@ -30,28 +32,57 @@ const StudentsTab = () => {
         const pct = total > 0 ? Math.round((present / total) * 100) : 0;
         return { ...s, present, total, pct };
       });
-  }, [students, entries, search, user]);
+    list.sort((a, b) => {
+      const val = sortField === 'name' ? a.name.localeCompare(b.name) : a.pct - b.pct;
+      return sortAsc ? val : -val;
+    });
+    return list;
+  }, [students, entries, search, user, sortField, sortAsc]);
+
+  const toggleSort = (field: 'name' | 'pct') => {
+    if (sortField === field) setSortAsc(!sortAsc);
+    else { setSortField(field); setSortAsc(true); }
+  };
+
+  const SortIcon = ({ field }: { field: 'name' | 'pct' }) => (
+    sortField === field
+      ? (sortAsc ? <ChevronUp className="w-3 h-3 inline ml-1 text-primary" /> : <ChevronDown className="w-3 h-3 inline ml-1 text-primary" />)
+      : null
+  );
 
   if (studentsLoading) {
     return (
-      <div className="p-4 md:p-6 space-y-4">
-        {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-14 bg-secondary/30 rounded-lg" />)}
+      <div className="p-4 md:p-6 space-y-3 max-w-[1200px] mx-auto">
+        {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-14 bg-secondary/30 rounded-[10px]" />)}
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 animate-fade-in-up">
-      <div className="glass-card p-5">
+    <div className="p-4 md:p-6 animate-fade-in-up max-w-[1200px] mx-auto">
+      <div className="glass-card p-5 md:p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary/15 border border-primary/30">
+              <Users className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-cinzel text-[0.85rem] font-semibold text-primary tracking-[0.2em] uppercase">Students</h2>
+              <p className="text-[0.6rem] text-muted-foreground tracking-[0.15em] uppercase">{studentStats.length} records</p>
+            </div>
+          </div>
+        </div>
+
         {/* Search */}
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="relative mb-5">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name, reg number, or suffix..."
-            className="w-full bg-input/50 border border-border/50 rounded-md pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+            className="w-full bg-card/70 border border-primary/10 rounded-[10px] pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_15px_hsla(42,88%,55%,0.08)] transition-all duration-200"
           />
         </div>
 
@@ -59,44 +90,56 @@ const StudentsTab = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border/30">
-                <th className="text-left py-3 px-2 text-xs font-cinzel text-muted-foreground tracking-wider">#</th>
-                <th className="text-left py-3 px-2 text-xs font-cinzel text-muted-foreground tracking-wider">REG NUMBER</th>
-                <th className="text-left py-3 px-2 text-xs font-cinzel text-muted-foreground tracking-wider">NAME</th>
-                <th className="text-center py-3 px-2 text-xs font-cinzel text-muted-foreground tracking-wider">CLASSES</th>
-                <th className="text-center py-3 px-2 text-xs font-cinzel text-muted-foreground tracking-wider">PRESENT</th>
-                <th className="text-left py-3 px-2 text-xs font-cinzel text-muted-foreground tracking-wider min-w-[120px]">ATTENDANCE</th>
-                <th className="text-center py-3 px-2 text-xs font-cinzel text-muted-foreground tracking-wider">STATUS</th>
+              <tr className="border-b border-primary/15">
+                <th className="text-left py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase">#</th>
+                <th className="text-left py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase">Reg Number</th>
+                <th
+                  className="text-left py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase cursor-pointer hover:text-primary transition-colors"
+                  onClick={() => toggleSort('name')}
+                >
+                  Name <SortIcon field="name" />
+                </th>
+                <th className="text-center py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase">Classes</th>
+                <th className="text-center py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase">Present</th>
+                <th
+                  className="text-left py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase min-w-[140px] cursor-pointer hover:text-primary transition-colors"
+                  onClick={() => toggleSort('pct')}
+                >
+                  Attendance <SortIcon field="pct" />
+                </th>
+                <th className="text-center py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase">Status</th>
               </tr>
             </thead>
             <tbody>
-              {studentStats.map((s, i) => (
-                <tr key={s.id} className="border-b border-border/10 hover:bg-secondary/20 transition-colors">
-                  <td className="py-3 px-2 font-mono-num text-muted-foreground">{s.suffix}</td>
-                  <td className="py-3 px-2 font-mono-num text-xs">{s.reg_number}</td>
-                  <td className="py-3 px-2 font-cormorant">{s.name}</td>
-                  <td className="py-3 px-2 text-center font-mono-num">{s.total}</td>
-                  <td className="py-3 px-2 text-center font-mono-num">{s.present}</td>
-                  <td className="py-3 px-2">
-                    <div className="flex items-center gap-2">
+              {studentStats.map((s) => (
+                <tr key={s.id} className="border-b border-primary/5 hover:bg-primary/[0.03] transition-all duration-200">
+                  <td className="py-3.5 px-3 font-mono-num text-muted-foreground text-xs">{s.suffix}</td>
+                  <td className="py-3.5 px-3 font-mono-num text-xs text-foreground/80">{s.reg_number}</td>
+                  <td className="py-3.5 px-3 text-foreground font-medium">{s.name}</td>
+                  <td className="py-3.5 px-3 text-center font-mono-num text-muted-foreground">{s.total}</td>
+                  <td className="py-3.5 px-3 text-center font-mono-num text-[hsl(150,50%,48%)]">{s.present}</td>
+                  <td className="py-3.5 px-3">
+                    <div className="flex items-center gap-2.5">
                       <div className="flex-1 h-2 bg-secondary/30 rounded-full overflow-hidden">
                         <div
                           className={cn(
-                            "h-full rounded-full transition-all",
-                            s.pct >= 75 ? "bg-emerald-400" : s.pct >= 60 ? "bg-yellow-400" : "bg-red-400"
+                            "h-full rounded-full transition-all duration-500",
+                            s.pct >= 75 ? "bg-[hsl(150,50%,48%)]" : s.pct >= 60 ? "bg-[hsl(40,80%,55%)]" : "bg-destructive"
                           )}
                           style={{ width: `${s.pct}%` }}
                         />
                       </div>
-                      <span className="font-mono-num text-xs w-10 text-right">{s.pct}%</span>
+                      <span className="font-mono-num text-xs w-10 text-right text-muted-foreground">{s.pct}%</span>
                     </div>
                   </td>
-                  <td className="py-3 px-2 text-center">
+                  <td className="py-3.5 px-3 text-center">
                     <span className={cn(
-                      "text-xs px-2 py-0.5 rounded-full",
-                      s.pct >= 75 ? "bg-emerald-400/10 text-emerald-400" : "bg-red-400/10 text-red-400"
+                      "text-[0.65rem] px-2.5 py-1 rounded-full font-cinzel tracking-wider",
+                      s.pct >= 75
+                        ? "bg-[hsla(150,50%,48%,0.1)] text-[hsl(150,50%,48%)] border border-[hsla(150,50%,48%,0.2)]"
+                        : "bg-destructive/10 text-destructive border border-destructive/20"
                     )}>
-                      {s.pct >= 75 ? '✓ Good' : '⚠ Low'}
+                      {s.pct >= 75 ? '✓ GOOD' : '⚠ LOW'}
                     </span>
                   </td>
                 </tr>
@@ -104,7 +147,7 @@ const StudentsTab = () => {
             </tbody>
           </table>
           {studentStats.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">No students found.</p>
+            <p className="text-center text-muted-foreground py-10 font-cinzel text-sm tracking-wider">No students found.</p>
           )}
         </div>
       </div>
