@@ -52,9 +52,9 @@ const AppHeader = () => {
           <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
             <span className="text-xs font-cinzel font-bold text-primary">{initials}</span>
           </div>
-          <div className="hidden md:block text-right">
+          <div className="text-right">
             <p className="text-sm font-medium text-foreground leading-tight">{user?.displayName}</p>
-            <p className="text-[10px] text-primary/70 uppercase tracking-wider">{user?.role}</p>
+            <p className="text-[10px] text-primary/70 uppercase tracking-wider hidden md:block">{user?.role}</p>
           </div>
         </div>
         <button
