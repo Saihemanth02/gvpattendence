@@ -138,9 +138,28 @@
   border-radius: 0.75rem;
 }
 
+.light .glass-card {
+  background: hsla(40, 25%, 98%, 0.7);
+  border: 1px solid hsla(42, 60%, 55%, 0.25);
+  box-shadow: 0 4px 24px hsla(225, 30%, 15%, 0.08);
+}
+
 .glass-card-hover:hover {
   border-color: hsla(42, 88%, 55%, 0.35);
   box-shadow: 0 0 30px hsla(42, 88%, 55%, 0.08);
+}
+
+.light .glass-card-hover:hover {
+  border-color: hsla(42, 70%, 50%, 0.5);
+  box-shadow: 0 4px 30px hsla(42, 70%, 50%, 0.15);
+}
+
+/* Light mode grid overlay */
+.light .gold-grid-bg {
+  background-image:
+    linear-gradient(rgba(180, 140, 40, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180, 140, 40, 0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
 }
 
 /* Animations */
