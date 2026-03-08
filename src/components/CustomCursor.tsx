@@ -4,9 +4,10 @@ const CustomCursor = () => {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const trailRefs = useRef<HTMLDivElement[]>([]);
-  const mouse = useRef({ x: -100, y: -100 });
-  const ring = useRef({ x: -100, y: -100 });
-  const trailPositions = useRef(Array.from({ length: 5 }, () => ({ x: -100, y: -100 })));
+  const mouse = useRef({ x: -200, y: -200 });
+  const ring = useRef({ x: -200, y: -200 });
+  const trailPositions = useRef(Array.from({ length: 5 }, () => ({ x: -200, y: -200 })));
+  const hasMovedRef = useRef(false);
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
