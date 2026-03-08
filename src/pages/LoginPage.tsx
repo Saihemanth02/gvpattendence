@@ -33,10 +33,10 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center gold-grid-bg relative overflow-hidden">
       <FloatingOrbs />
-      <div className="animate-fade-in-up relative z-10 w-full max-w-md md:max-w-lg mx-4">
+      <div className="relative z-10 w-full max-w-md md:max-w-lg mx-4">
         {/* Logo */}
         <div className="flex flex-col items-center mb-10 md:mb-14 w-full pt-4 md:pt-10">
-          <div className="relative mb-8 md:mb-10">
+          <div className="relative mb-8 md:mb-10 animate-scale-in" style={{ animationDuration: '0.6s', animationFillMode: 'both' }}>
             <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-primary/30 animate-rotate-ring absolute -inset-2" />
             <img
               src="/gvplogo.jpg"
@@ -50,16 +50,16 @@ const LoginPage = () => {
             
             <span className="fallback-emblem hidden text-5xl md:text-6xl text-primary animate-pulse-gold absolute inset-0 flex items-center justify-center">⚜</span>
           </div>
-          <h1 className="font-cinzel text-3xl md:text-5xl font-bold text-primary tracking-wider text-center leading-tight mt-2">
+          <h1 className="font-cinzel text-3xl md:text-5xl font-bold text-primary tracking-wider text-center leading-tight mt-2 animate-fade-in" style={{ animationDelay: '0.3s', animationDuration: '0.5s', animationFillMode: 'both' }}>
             Gayatri vidya parishad
           </h1>
-          <p className="text-[11px] md:text-sm tracking-[0.3em] text-muted-foreground mt-3 md:mt-4 text-center">
+          <p className="text-[11px] md:text-sm tracking-[0.3em] text-muted-foreground mt-3 md:mt-4 text-center animate-fade-in" style={{ animationDelay: '0.5s', animationDuration: '0.5s', animationFillMode: 'both' }}>
             ROYAL ATTENDANCE MANAGEMENT
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="glass-card p-6 md:p-10">
+        <div className="glass-card p-6 md:p-10 animate-fade-in" style={{ animationDelay: '0.7s', animationDuration: '0.6s', animationFillMode: 'both' }}>
           {/* Role Tabs */}
           <div className="flex mb-6 bg-secondary/30 rounded-lg p-1">
             {(['faculty', 'student'] as const).map((r) =>
