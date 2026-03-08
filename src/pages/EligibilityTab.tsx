@@ -16,6 +16,7 @@ const EligibilityTab = () => {
   const recordIds = useMemo(() => records?.map(r => r.id), [records]);
   const { data: entries } = useAttendanceEntries(recordIds);
   const [filterStatus, setFilterStatus] = useState<'all' | 'eligible' | 'not-eligible'>('all');
+  const [search, setSearch] = useState('');
 
   const eligibilityData = useMemo(() => {
     if (!students?.length || !records?.length || !entries?.length) return [];
