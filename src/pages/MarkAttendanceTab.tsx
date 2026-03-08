@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Send } from 'lucide-react';
+import { CalendarIcon, Send, CheckCircle, XCircle } from 'lucide-react';
 
 const SECTIONS = ['A', 'B', 'CSE', 'MCA'];
 const PERIODS = [1, 2, 3, 4, 5, 6, 7];
@@ -52,34 +52,42 @@ const MarkAttendanceTab = () => {
 
   return (
     <div className="p-4 md:p-6 animate-fade-in-up max-w-3xl mx-auto">
-      <div className="glass-card p-6 space-y-5">
-        <h2 className="font-cinzel text-lg text-primary tracking-wider">MARK ATTENDANCE</h2>
+      <div className="glass-card p-6 md:p-8 space-y-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary/15 border border-primary/30">
+            <Send className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-cinzel text-base font-semibold text-primary tracking-[0.2em]">MARK ATTENDANCE</h2>
+            <p className="text-[0.6rem] text-muted-foreground tracking-[0.15em] uppercase">Fill in the details below</p>
+          </div>
+        </div>
 
         {/* Subject */}
         <div>
-          <label className="text-xs text-muted-foreground font-cinzel tracking-wider mb-1 block">SUBJECT</label>
+          <label className="text-[0.65rem] text-muted-foreground font-cinzel tracking-[0.2em] mb-2 block uppercase">Subject</label>
           <input
             type="text"
             value={subject}
             onChange={e => setSubject(e.target.value)}
             placeholder="e.g. Data Structures"
-            className="w-full bg-input/50 border border-border/50 rounded-md px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+            className="w-full bg-card/70 border border-primary/10 rounded-[10px] px-4 py-3 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_15px_hsla(42,88%,55%,0.08)] transition-all duration-200"
           />
         </div>
 
         {/* Section */}
         <div>
-          <label className="text-xs text-muted-foreground font-cinzel tracking-wider mb-1 block">SECTION</label>
+          <label className="text-[0.65rem] text-muted-foreground font-cinzel tracking-[0.2em] mb-2 block uppercase">Section</label>
           <div className="flex gap-2 flex-wrap">
             {SECTIONS.map(s => (
               <button
                 key={s}
                 onClick={() => setSection(s)}
                 className={cn(
-                  "px-4 py-1.5 rounded-md text-sm font-cinzel border transition-all",
+                  "px-5 py-2 rounded-[10px] text-sm font-cinzel border transition-all duration-200",
                   section === s
-                    ? "bg-primary/15 text-primary border-primary/40"
-                    : "bg-secondary/30 text-muted-foreground border-border/30 hover:text-foreground"
+                    ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
+                    : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
                 )}
               >
                 {s}
@@ -90,12 +98,12 @@ const MarkAttendanceTab = () => {
 
         {/* Date */}
         <div>
-          <label className="text-xs text-muted-foreground font-cinzel tracking-wider mb-1 block">DATE</label>
+          <label className="text-[0.65rem] text-muted-foreground font-cinzel tracking-[0.2em] mb-2 block uppercase">Date</label>
           <Popover>
             <PopoverTrigger asChild>
-              <button className="flex items-center gap-2 bg-input/50 border border-border/50 rounded-md px-4 py-2.5 text-foreground hover:border-primary/30 transition-colors">
+              <button className="flex items-center gap-3 bg-card/70 border border-primary/10 rounded-[10px] px-4 py-3 text-foreground hover:border-primary/30 transition-all duration-200">
                 <CalendarIcon className="w-4 h-4 text-primary/60" />
-                {format(date, 'PPP')}
+                <span className="font-mono-num text-sm">{format(date, 'dd MMM yyyy')}</span>
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -106,17 +114,17 @@ const MarkAttendanceTab = () => {
 
         {/* Period */}
         <div>
-          <label className="text-xs text-muted-foreground font-cinzel tracking-wider mb-1 block">PERIOD</label>
+          <label className="text-[0.65rem] text-muted-foreground font-cinzel tracking-[0.2em] mb-2 block uppercase">Period</label>
           <div className="flex gap-2 flex-wrap">
             {PERIODS.map(p => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
                 className={cn(
-                  "w-10 h-10 rounded-lg text-sm font-mono-num border transition-all",
+                  "w-11 h-11 rounded-[10px] text-sm font-mono-num border transition-all duration-200",
                   period === p
-                    ? "bg-primary/15 text-primary border-primary/40"
-                    : "bg-secondary/30 text-muted-foreground border-border/30 hover:text-foreground"
+                    ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
+                    : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
                 )}
               >
                 P{p}
@@ -127,15 +135,16 @@ const MarkAttendanceTab = () => {
 
         {/* Absent suffixes */}
         <div>
-          <label className="text-xs text-muted-foreground font-cinzel tracking-wider mb-1 block">
-            ABSENT ROLL SUFFIXES (comma or space separated)
+          <label className="text-[0.65rem] text-muted-foreground font-cinzel tracking-[0.2em] mb-2 block uppercase">
+            Absent Roll Suffixes
           </label>
+          <p className="text-[0.6rem] text-muted-foreground/60 mb-2">Comma or space separated</p>
           <textarea
             value={absentText}
             onChange={e => setAbsentText(e.target.value)}
             placeholder="e.g. 002, 015, 033"
             rows={3}
-            className="w-full bg-input/50 border border-border/50 rounded-md px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 font-mono-num"
+            className="w-full bg-card/70 border border-primary/10 rounded-[10px] px-4 py-3 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_15px_hsla(42,88%,55%,0.08)] transition-all duration-200 font-mono-num resize-none"
           />
         </div>
 
@@ -143,33 +152,45 @@ const MarkAttendanceTab = () => {
         {parsedAbsent.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {parsedAbsent.map(suffix => (
-              <span key={suffix} className="px-2 py-1 text-xs rounded-md bg-primary/10 border border-primary/20 text-primary font-cormorant">
+              <span key={suffix} className="px-3 py-1 text-[0.7rem] rounded-[8px] bg-destructive/10 border border-destructive/20 text-destructive font-mono-num flex items-center gap-1.5">
+                <XCircle className="w-3 h-3" />
                 {suffix} — {studentMap[suffix]}
               </span>
             ))}
           </div>
         )}
 
-        {/* Summary */}
-        <div className="text-sm text-muted-foreground font-mono-num">
-          <span className="text-red-400">{parsedAbsent.length} absent</span>
-          <span className="mx-2">·</span>
-          <span className="text-emerald-400">{presentCount} present</span>
-          <span className="mx-2">out of</span>
-          <span>{allSuffixes.length}</span>
+        {/* Summary bar */}
+        <div className="flex items-center gap-4 p-3 rounded-[10px] bg-card/50 border border-primary/10">
+          <div className="flex items-center gap-1.5">
+            <XCircle className="w-3.5 h-3.5 text-destructive" />
+            <span className="font-mono-num text-sm text-destructive font-semibold">{parsedAbsent.length}</span>
+            <span className="text-[0.65rem] text-muted-foreground uppercase tracking-wider">absent</span>
+          </div>
+          <span className="text-muted-foreground/20">|</span>
+          <div className="flex items-center gap-1.5">
+            <CheckCircle className="w-3.5 h-3.5 text-[hsl(150,50%,48%)]" />
+            <span className="font-mono-num text-sm text-[hsl(150,50%,48%)] font-semibold">{presentCount}</span>
+            <span className="text-[0.65rem] text-muted-foreground uppercase tracking-wider">present</span>
+          </div>
+          <span className="text-muted-foreground/20">|</span>
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono-num text-sm text-muted-foreground">{allSuffixes.length}</span>
+            <span className="text-[0.65rem] text-muted-foreground uppercase tracking-wider">total</span>
+          </div>
         </div>
 
         <button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="w-full py-3 rounded-md bg-gradient-to-r from-gold-dark via-primary to-gold-light text-primary-foreground font-cinzel font-bold tracking-wider hover:shadow-[0_0_20px_hsla(42,88%,55%,0.3)] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-[10px] bg-gradient-to-r from-gold-dark via-primary to-gold-light text-primary-foreground font-cinzel font-bold tracking-[0.15em] text-sm hover:shadow-[0_0_25px_hsla(42,88%,55%,0.3)] transition-all duration-300 disabled:opacity-40 disabled:hover:shadow-none flex items-center justify-center gap-2"
         >
           {submitMutation.isPending ? (
             <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
           ) : (
             <>
               <Send className="w-4 h-4" />
-              Submit Attendance
+              SUBMIT ATTENDANCE
             </>
           )}
         </button>
