@@ -2,9 +2,10 @@ import { useMemo, useState } from 'react';
 import { useStudents } from '@/hooks/useStudents';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, Filter, Download } from 'lucide-react';
+import { CheckCircle2, XCircle, Filter, Download, Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const SUBJECT_THRESHOLD = 65;
 const OVERALL_THRESHOLD = 75;
@@ -15,6 +16,7 @@ const EligibilityTab = () => {
   const recordIds = useMemo(() => records?.map(r => r.id), [records]);
   const { data: entries } = useAttendanceEntries(recordIds);
   const [filterStatus, setFilterStatus] = useState<'all' | 'eligible' | 'not-eligible'>('all');
+  const [search, setSearch] = useState('');
 
   const eligibilityData = useMemo(() => {
     if (!students?.length || !records?.length || !entries?.length) return [];
@@ -72,10 +74,15 @@ const EligibilityTab = () => {
   const withData = useMemo(() => eligibilityData.filter(s => s.totalClasses > 0), [eligibilityData]);
 
   const filtered = useMemo(() => {
-    if (filterStatus === 'eligible') return withData.filter(s => s.isEligible);
-    if (filterStatus === 'not-eligible') return withData.filter(s => !s.isEligible);
-    return withData;
-  }, [withData, filterStatus]);
+    let list = withData;
+    if (filterStatus === 'eligible') list = list.filter(s => s.isEligible);
+    if (filterStatus === 'not-eligible') list = list.filter(s => !s.isEligible);
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(s => s.name.toLowerCase().includes(q) || s.reg_number.toLowerCase().includes(q) || s.suffix.includes(q));
+    }
+    return list;
+  }, [withData, filterStatus, search]);
 
   const eligibleCount = withData.filter(s => s.isEligible).length;
   const notEligibleCount = withData.length - eligibleCount;
@@ -132,9 +139,18 @@ const EligibilityTab = () => {
         </div>
       </div>
 
-      {/* Filter & Export */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      {/* Search & Filter & Export */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search name or reg number..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 w-64 glass-card border-primary/20 text-sm"
+            />
+          </div>
           <Filter className="w-4 h-4 text-muted-foreground" />
           <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as 'all' | 'eligible' | 'not-eligible')}>
             <SelectTrigger className="w-48 glass-card border-primary/20">
