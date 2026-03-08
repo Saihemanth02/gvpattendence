@@ -6,6 +6,7 @@ import FloatingOrbs from '@/components/FloatingOrbs';
 import SparkleCanvas from '@/components/SparkleCanvas';
 import AppHeader from '@/components/AppHeader';
 import NavigationTabs, { type TabId } from '@/components/NavigationTabs';
+import MobileBottomNav from '@/components/MobileBottomNav';
 import DashboardTab from '@/pages/DashboardTab';
 import MarkAttendanceTab from '@/pages/MarkAttendanceTab';
 import StudentsTab from '@/pages/StudentsTab';
@@ -74,7 +75,7 @@ const Index = () => {
         <AppHeader />
         <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} />
         <main
-          className="pb-8"
+          className="pb-24 md:pb-8"
           style={{
             opacity: transitioning ? 0 : 1,
             transform: transitioning ? 'translateY(8px)' : 'translateY(0)',
@@ -84,6 +85,7 @@ const Index = () => {
           <ActiveComponent />
         </main>
       </div>
+      <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
 };

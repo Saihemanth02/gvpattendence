@@ -332,3 +332,8 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsla(42, 88%, 55%, 0.5);
 }
+
+/* Safe area for mobile bottom nav */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
