@@ -12,7 +12,11 @@ const CustomCursor = () => {
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       mouse.current = { x: e.clientX, y: e.clientY };
-    };
+      if (!hasMovedRef.current) {
+        hasMovedRef.current = true;
+        ring.current = { x: e.clientX, y: e.clientY };
+        trailPositions.current = Array.from({ length: 5 }, () => ({ x: e.clientX, y: e.clientY }));
+      }
 
     let raf: number;
     const animate = () => {
