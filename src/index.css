@@ -113,6 +113,20 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Cinzel', serif;
   }
+
+  /* Smooth theme transitions on all color properties */
+  :root, .light {
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body, header, nav, main, section, div, button, input, select, textarea,
+  .glass-card, [class*="bg-"], [class*="text-"], [class*="border-"] {
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 @media (min-width: 768px) {
