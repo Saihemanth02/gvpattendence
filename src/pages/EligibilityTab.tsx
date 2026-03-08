@@ -139,9 +139,18 @@ const EligibilityTab = () => {
         </div>
       </div>
 
-      {/* Filter & Export */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      {/* Search & Filter & Export */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search name or reg number..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 w-64 glass-card border-primary/20 text-sm"
+            />
+          </div>
           <Filter className="w-4 h-4 text-muted-foreground" />
           <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as 'all' | 'eligible' | 'not-eligible')}>
             <SelectTrigger className="w-48 glass-card border-primary/20">
