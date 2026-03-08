@@ -74,10 +74,15 @@ const EligibilityTab = () => {
   const withData = useMemo(() => eligibilityData.filter(s => s.totalClasses > 0), [eligibilityData]);
 
   const filtered = useMemo(() => {
-    if (filterStatus === 'eligible') return withData.filter(s => s.isEligible);
-    if (filterStatus === 'not-eligible') return withData.filter(s => !s.isEligible);
-    return withData;
-  }, [withData, filterStatus]);
+    let list = withData;
+    if (filterStatus === 'eligible') list = list.filter(s => s.isEligible);
+    if (filterStatus === 'not-eligible') list = list.filter(s => !s.isEligible);
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(s => s.name.toLowerCase().includes(q) || s.reg_number.toLowerCase().includes(q) || s.suffix.includes(q));
+    }
+    return list;
+  }, [withData, filterStatus, search]);
 
   const eligibleCount = withData.filter(s => s.isEligible).length;
   const notEligibleCount = withData.length - eligibleCount;
