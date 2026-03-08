@@ -4,15 +4,17 @@ const CustomCursor = () => {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const trailRefs = useRef<HTMLDivElement[]>([]);
-  const mouse = useRef({ x: -200, y: -200 });
-  const ring = useRef({ x: -200, y: -200 });
-  const trailPositions = useRef(Array.from({ length: 5 }, () => ({ x: -200, y: -200 })));
+  const mouse = useRef({ x: 0, y: 0 });
+  const ring = useRef({ x: 0, y: 0 });
+  const trailPositions = useRef(Array.from({ length: 5 }, () => ({ x: 0, y: 0 })));
+  const hasMoved = useRef(false);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       mouse.current = { x: e.clientX, y: e.clientY };
-      if (!visible) {
+      if (!hasMoved.current) {
+        hasMoved.current = true;
         ring.current = { x: e.clientX, y: e.clientY };
         trailPositions.current = Array.from({ length: 5 }, () => ({ x: e.clientX, y: e.clientY }));
         setVisible(true);
@@ -21,6 +23,11 @@ const CustomCursor = () => {
 
     let raf: number;
     const animate = () => {
+      if (!hasMoved.current) {
+        raf = requestAnimationFrame(animate);
+        return;
+      }
+
       if (dotRef.current) {
         dotRef.current.style.transform = `translate(${mouse.current.x - 4}px, ${mouse.current.y - 4}px)`;
       }
@@ -56,11 +63,13 @@ const CustomCursor = () => {
       window.removeEventListener("mousemove", onMouseMove);
       cancelAnimationFrame(raf);
     };
-  }, [visible]);
+  }, []);
+
+  if (!visible) return null;
 
   return (
     <div
-      className={`pointer-events-none fixed inset-0 z-[9999] md:block ${visible ? 'block' : 'hidden'}`}
+      className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
       style={{ cursor: "none" }}
     >
       <div
