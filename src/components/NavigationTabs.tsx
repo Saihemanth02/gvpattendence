@@ -24,22 +24,24 @@ const NavigationTabs = ({ activeTab, onTabChange }: NavigationTabsProps) => {
   const visibleTabs = tabs.filter(t => !t.facultyOnly || user?.role === 'faculty');
 
   return (
-    <nav className="flex gap-1 p-1 glass-card mx-4 md:mx-6 mt-4 rounded-lg overflow-x-auto">
-      {visibleTabs.map(tab => (
-        <button
-          key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          className={cn(
-            "flex items-center gap-2 px-3 md:px-4 py-2 rounded-md text-sm font-cinzel transition-all whitespace-nowrap",
-            activeTab === tab.id
-              ? "bg-primary/15 text-primary border border-primary/30 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
-              : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-          )}
-        >
-          {tab.icon}
-          <span className="hidden md:inline">{tab.label}</span>
-        </button>
-      ))}
+    <nav className="bg-background/90 backdrop-blur-sm border-b-2 border-primary px-4 md:px-6 overflow-x-auto">
+      <div className="flex gap-1 py-1">
+        {visibleTabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            className={cn(
+              'flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-[0.8rem] font-cinzel transition-all whitespace-nowrap',
+              activeTab === tab.id
+                ? 'bg-gradient-to-br from-secondary to-primary/15 text-primary border border-primary/40 font-semibold shadow-[0_0_15px_hsla(42,88%,55%,0.08)]'
+                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/40 border border-transparent'
+            )}
+          >
+            {tab.icon}
+            <span className="hidden md:inline">{tab.label}</span>
+          </button>
+        ))}
+      </div>
     </nav>
   );
 };
