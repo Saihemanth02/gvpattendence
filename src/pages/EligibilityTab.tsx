@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react';
 import { useStudents } from '@/hooks/useStudents';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, Filter } from 'lucide-react';
+import { CheckCircle2, XCircle, Filter, Download } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 const SUBJECT_THRESHOLD = 65;
 const OVERALL_THRESHOLD = 75;
@@ -79,6 +80,31 @@ const EligibilityTab = () => {
   const eligibleCount = withData.filter(s => s.isEligible).length;
   const notEligibleCount = withData.length - eligibleCount;
 
+  const exportCSV = () => {
+    if (!filtered.length) return;
+    const subjects = [...new Set(filtered.flatMap(s => s.subjects.map(sub => sub.name)))].sort();
+    const headers = ['Reg Number', 'Name', 'Suffix', 'Overall %', ...subjects.map(s => `${s} %`), 'Status'];
+    const rows = filtered.map(s => [
+      s.reg_number,
+      s.name,
+      s.suffix,
+      s.overallPercent.toFixed(1),
+      ...subjects.map(subName => {
+        const sub = s.subjects.find(x => x.name === subName);
+        return sub ? sub.percent.toFixed(1) : '0.0';
+      }),
+      s.isEligible ? 'Eligible' : 'Not Eligible',
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `eligibility-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Summary Cards */}
@@ -106,19 +132,31 @@ const EligibilityTab = () => {
         </div>
       </div>
 
-      {/* Filter */}
-      <div className="flex items-center gap-2">
-        <Filter className="w-4 h-4 text-muted-foreground" />
-        <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as 'all' | 'eligible' | 'not-eligible')}>
-          <SelectTrigger className="w-48 glass-card border-primary/20">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Students</SelectItem>
-            <SelectItem value="eligible">Eligible Only</SelectItem>
-            <SelectItem value="not-eligible">Not Eligible Only</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Filter & Export */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as 'all' | 'eligible' | 'not-eligible')}>
+            <SelectTrigger className="w-48 glass-card border-primary/20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Students</SelectItem>
+              <SelectItem value="eligible">Eligible Only</SelectItem>
+              <SelectItem value="not-eligible">Not Eligible Only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button
+          onClick={exportCSV}
+          variant="outline"
+          size="sm"
+          className="border-primary/30 text-primary hover:bg-primary/10 font-cinzel"
+          disabled={filtered.length === 0}
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export CSV
+        </Button>
       </div>
 
       {/* Student List */}
