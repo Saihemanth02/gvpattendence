@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import SplashScreen from '@/components/SplashScreen';
 import LoginPage from '@/pages/LoginPage';
 import FloatingOrbs from '@/components/FloatingOrbs';
+import SparkleCanvas from '@/components/SparkleCanvas';
 import AppHeader from '@/components/AppHeader';
 import NavigationTabs, { type TabId } from '@/components/NavigationTabs';
 import DashboardTab from '@/pages/DashboardTab';
@@ -50,10 +51,11 @@ const Index = () => {
   return (
     <div className="min-h-screen gold-grid-bg relative">
       <FloatingOrbs />
+      <SparkleCanvas />
       <div className="relative z-10">
         <AppHeader />
         <NavigationTabs activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="pb-8">
+        <main className="pb-8 animate-fade-in-up" style={{ animationDuration: '0.4s' }}>
           {renderTab()}
         </main>
       </div>
