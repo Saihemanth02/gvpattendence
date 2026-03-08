@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import SplashScreen from '@/components/SplashScreen';
 import LoginPage from '@/pages/LoginPage';
@@ -13,12 +13,40 @@ import HistoryTab from '@/pages/HistoryTab';
 import WeeklyViewTab from '@/pages/WeeklyViewTab';
 import EligibilityTab from '@/pages/EligibilityTab';
 
+const tabComponent: Record<TabId, React.FC> = {
+  dashboard: DashboardTab,
+  mark: MarkAttendanceTab,
+  students: StudentsTab,
+  history: HistoryTab,
+  weekly: WeeklyViewTab,
+  eligibility: EligibilityTab,
+};
+
 const Index = () => {
   const { user, loading } = useAuth();
   const [splashDone, setSplashDone] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
+  const [displayedTab, setDisplayedTab] = useState<TabId>('dashboard');
+  const [transitioning, setTransitioning] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const handleSplashComplete = useCallback(() => setSplashDone(true), []);
+
+  const handleTabChange = useCallback((tab: TabId) => {
+    if (tab === activeTab) return;
+    setTransitioning(true);
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setActiveTab(tab);
+      setDisplayedTab(tab);
+      // Small delay to let React render new content before fading in
+      requestAnimationFrame(() => setTransitioning(false));
+    }, 200); // matches fade-out duration
+  }, [activeTab]);
+
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current);
+  }, []);
 
   if (!splashDone) {
     return <SplashScreen onComplete={handleSplashComplete} />;
@@ -36,17 +64,7 @@ const Index = () => {
     return <LoginPage />;
   }
 
-  const renderTab = () => {
-    switch (activeTab) {
-      case 'dashboard': return <DashboardTab />;
-      case 'mark': return <MarkAttendanceTab />;
-      case 'students': return <StudentsTab />;
-      case 'history': return <HistoryTab />;
-      case 'weekly': return <WeeklyViewTab />;
-      case 'eligibility': return <EligibilityTab />;
-      default: return <DashboardTab />;
-    }
-  };
+  const ActiveComponent = tabComponent[displayedTab];
 
   return (
     <div className="min-h-screen gold-grid-bg relative">
@@ -54,9 +72,16 @@ const Index = () => {
       <SparkleCanvas />
       <div className="relative z-10">
         <AppHeader />
-        <NavigationTabs activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="pb-8 animate-fade-in-up" style={{ animationDuration: '0.4s' }}>
-          {renderTab()}
+        <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} />
+        <main
+          className="pb-8"
+          style={{
+            opacity: transitioning ? 0 : 1,
+            transform: transitioning ? 'translateY(8px)' : 'translateY(0)',
+            transition: 'opacity 0.25s ease, transform 0.25s ease',
+          }}
+        >
+          <ActiveComponent />
         </main>
       </div>
     </div>
