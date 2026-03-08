@@ -68,11 +68,13 @@ const EligibilityTab = () => {
     });
   }, [students, records, entries]);
 
+  const withData = useMemo(() => eligibilityData.filter(s => s.totalClasses > 0), [eligibilityData]);
+
   const filtered = useMemo(() => {
-    if (filterStatus === 'eligible') return eligibilityData.filter(s => s.isEligible);
-    if (filterStatus === 'not-eligible') return eligibilityData.filter(s => !s.isEligible);
-    return eligibilityData;
-  }, [eligibilityData, filterStatus]);
+    if (filterStatus === 'eligible') return withData.filter(s => s.isEligible);
+    if (filterStatus === 'not-eligible') return withData.filter(s => !s.isEligible);
+    return withData;
+  }, [withData, filterStatus]);
 
   const eligibleCount = eligibilityData.filter(s => s.isEligible).length;
   const notEligibleCount = eligibilityData.length - eligibleCount;
