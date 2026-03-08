@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const CustomCursor = () => {
   const dotRef = useRef<HTMLDivElement>(null);
@@ -7,33 +7,30 @@ const CustomCursor = () => {
   const mouse = useRef({ x: -200, y: -200 });
   const ring = useRef({ x: -200, y: -200 });
   const trailPositions = useRef(Array.from({ length: 5 }, () => ({ x: -200, y: -200 })));
-  const hasMovedRef = useRef(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       mouse.current = { x: e.clientX, y: e.clientY };
-      if (!hasMovedRef.current) {
-        hasMovedRef.current = true;
+      if (!visible) {
         ring.current = { x: e.clientX, y: e.clientY };
         trailPositions.current = Array.from({ length: 5 }, () => ({ x: e.clientX, y: e.clientY }));
+        setVisible(true);
       }
     };
 
     let raf: number;
     const animate = () => {
-      // Dot follows instantly
       if (dotRef.current) {
         dotRef.current.style.transform = `translate(${mouse.current.x - 4}px, ${mouse.current.y - 4}px)`;
       }
 
-      // Ring follows with delay
       ring.current.x += (mouse.current.x - ring.current.x) * 0.15;
       ring.current.y += (mouse.current.y - ring.current.y) * 0.15;
       if (ringRef.current) {
         ringRef.current.style.transform = `translate(${ring.current.x - 18}px, ${ring.current.y - 18}px)`;
       }
 
-      // Trail particles follow with increasing delay
       for (let i = 0; i < trailPositions.current.length; i++) {
         const target = i === 0 ? ring.current : trailPositions.current[i - 1];
         const speed = 0.08 - i * 0.01;
@@ -59,29 +56,29 @@ const CustomCursor = () => {
       window.removeEventListener("mousemove", onMouseMove);
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [visible]);
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999] hidden md:block" style={{ cursor: "none", visibility: hasMovedRef.current ? "visible" : "hidden" }}>
-      {/* Inner dot */}
+    <div
+      className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
+      style={{ cursor: "none", opacity: visible ? 1 : 0 }}
+    >
       <div
         ref={dotRef}
         className="absolute w-2 h-2 rounded-full"
-        style={{ background: "hsl(var(--gold))", left: "-100px", top: "-100px" }}
+        style={{ background: "hsl(var(--gold))" }}
       />
-      {/* Outer ring */}
       <div
         ref={ringRef}
         className="absolute w-9 h-9 rounded-full border-2 animate-rotate-ring"
-        style={{ borderColor: "hsla(42, 88%, 55%, 0.5)", left: "-100px", top: "-100px" }}
+        style={{ borderColor: "hsla(42, 88%, 55%, 0.5)" }}
       />
-      {/* Trail dots */}
       {Array.from({ length: 5 }).map((_, i) => (
         <div
           key={i}
           ref={(el) => { if (el) trailRefs.current[i] = el; }}
           className="absolute rounded-full"
-          style={{ background: "hsl(var(--gold))", left: "-100px", top: "-100px" }}
+          style={{ background: "hsl(var(--gold))" }}
         />
       ))}
     </div>
