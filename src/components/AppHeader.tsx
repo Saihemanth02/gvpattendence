@@ -25,16 +25,16 @@ const AppHeader = () => {
         <img
           src="/gvplogo.jpg"
           alt="GVP Logo"
-          className="w-10 h-10 rounded-full object-cover border border-primary/30"
+          className="w-10 h-10 rounded-full object-cover border border-primary/30 flex-shrink-0"
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = 'none';
           }} />
         
-        <div>
-          <h1 className="font-cinzel text-lg md:text-xl font-bold text-primary leading-tight">
+        <div className="flex flex-col justify-center">
+          <h1 className="font-cinzel text-lg md:text-xl font-bold text-primary leading-none">
             GVP DASHBOARD  
           </h1>
-          <p className="text-[10px] tracking-[0.2em] text-muted-foreground hidden md:block">
+          <p className="text-[10px] tracking-[0.2em] text-muted-foreground hidden md:block leading-none mt-1">
             ATTENDANCE MANAGEMENT SYSTEM
           </p>
         </div>
