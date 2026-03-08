@@ -87,13 +87,9 @@ serve(async (req) => {
     });
 
     if (facultyErr) {
-      if (facultyErr.message?.includes("already")) {
-        results.push("Faculty user already exists");
-      } else {
-        results.push(`Faculty error: ${facultyErr.message}`);
-      }
+      results.push(`Faculty error: ${JSON.stringify(facultyErr)}`);
     } else {
-      results.push("Faculty user created");
+      results.push(`Faculty user created: ${facultyUser?.user?.id}`);
     }
 
     // 2. Create student users and seed students table
