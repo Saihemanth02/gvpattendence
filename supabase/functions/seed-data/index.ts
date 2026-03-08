@@ -71,72 +71,92 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 
     const results: string[] = [];
 
-    // 1. Create faculty user
-    const { data: facultyUser, error: facultyErr } = await supabaseAdmin.auth.admin.createUser({
-      email: "admin@gvp.faculty",
-      password: "admin123",
-      email_confirm: true,
-      user_metadata: { username: "admin", display_name: "Admin Faculty", role: "faculty" },
-    });
-
-    if (facultyErr) {
-      results.push(`Faculty error: ${JSON.stringify(facultyErr)}`);
-    } else {
-      results.push(`Faculty user created: ${facultyUser?.user?.id}`);
+    // Helper: create user, profile, role, and optionally student record
+    async function seedUser(
+      email: string,
+      password: string,
+      username: string,
+      displayName: string,
+      role: "faculty" | "student",
+      studentData?: { suffix: string; reg_number: string; name: string }
+    ) {
+      // First, try to find existing user
+      const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+      const existing = users?.find(u => u.email === email);
+      
+      let userId: string;
+      
+      if (existing) {
+        userId = existing.id;
+        results.push(`${role} ${username}: user already exists`);
+      } else {
+        // Disable trigger temporarily by creating user without metadata
+        // and manually inserting profile/roles
+        const res = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${serviceRoleKey}`,
+            "apikey": serviceRoleKey,
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            email_confirm: true,
+            user_metadata: { username, display_name: displayName, role },
+          }),
+        });
+        
+        const resBody = await res.json();
+        if (!res.ok) {
+          results.push(`${role} ${username}: create failed - ${JSON.stringify(resBody)}`);
+          return;
+        }
+        userId = resBody.id;
+        results.push(`${role} ${username}: user created`);
+      }
+      
+      // Ensure profile exists
+      const { error: profileErr } = await supabaseAdmin
+        .from("profiles")
+        .upsert({ user_id: userId, username, display_name: displayName, role }, { onConflict: "user_id" });
+      if (profileErr) results.push(`  profile error: ${profileErr.message}`);
+      
+      // Ensure role exists
+      const { error: roleErr } = await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: userId, role }, { onConflict: "user_id,role" });
+      if (roleErr) results.push(`  role error: ${roleErr.message}`);
+      
+      // Student record
+      if (studentData) {
+        const { error: studentErr } = await supabaseAdmin
+          .from("students")
+          .upsert({ suffix: studentData.suffix, reg_number: studentData.reg_number, name: studentData.name, user_id: userId }, { onConflict: "suffix" });
+        if (studentErr) results.push(`  student error: ${studentErr.message}`);
+      }
     }
 
-    // 2. Create student users and seed students table
-    for (const s of STUDENTS) {
-      const email = `${s.suffix}@gvp.student`;
-      
-      const { data: studentUser, error: studentErr } = await supabaseAdmin.auth.admin.createUser({
-        email,
-        password: "student123",
-        email_confirm: true,
-        user_metadata: { username: s.suffix, display_name: s.name, role: "student" },
-      });
+    // 1. Create faculty
+    await seedUser("admin@gvp.faculty", "admin123", "admin", "Admin Faculty", "faculty");
 
-      if (studentErr) {
-        if (studentErr.message?.includes("already")) {
-          // Get existing user
-          const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
-          const existing = users?.find(u => u.email === email);
-          if (existing) {
-            // Upsert student record
-            await supabaseAdmin.from("students").upsert({
-              suffix: s.suffix,
-              reg_number: s.reg_number,
-              name: s.name,
-              user_id: existing.id,
-            }, { onConflict: "suffix" });
-          }
-          results.push(`Student ${s.suffix} already exists`);
-        } else {
-          results.push(`Student ${s.suffix} error: ${studentErr.message}`);
-        }
-      } else if (studentUser?.user) {
-        await supabaseAdmin.from("students").upsert({
-          suffix: s.suffix,
-          reg_number: s.reg_number,
-          name: s.name,
-          user_id: studentUser.user.id,
-        }, { onConflict: "suffix" });
-        results.push(`Student ${s.suffix} created`);
-      }
+    // 2. Create students
+    for (const s of STUDENTS) {
+      await seedUser(`${s.suffix}@gvp.student`, "student123", s.suffix, s.name, "student", s);
     }
 
     return new Response(JSON.stringify({ success: true, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error.message, stack: error.stack }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
