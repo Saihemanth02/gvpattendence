@@ -85,7 +85,7 @@ const EligibilityTab = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="glass-card p-4 rounded-lg text-center">
           <p className="text-muted-foreground text-sm font-cormorant">Total Students</p>
-          <p className="text-3xl font-bold font-cinzel text-primary">{eligibilityData.length}</p>
+          <p className="text-3xl font-bold font-cinzel text-primary">{withData.length}</p>
         </div>
         <div className="glass-card p-4 rounded-lg text-center">
           <p className="text-muted-foreground text-sm font-cormorant">Eligible</p>
