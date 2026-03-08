@@ -75,7 +75,7 @@ const Index = () => {
         <AppHeader />
         <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} />
         <main
-          className="pb-8"
+          className="pb-24 md:pb-8"
           style={{
             opacity: transitioning ? 0 : 1,
             transform: transitioning ? 'translateY(8px)' : 'translateY(0)',
@@ -85,6 +85,7 @@ const Index = () => {
           <ActiveComponent />
         </main>
       </div>
+      <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
 };
