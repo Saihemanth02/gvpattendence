@@ -62,26 +62,26 @@ const CustomCursor = () => {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999] hidden md:block" style={{ cursor: "none" }}>
+    <div className="pointer-events-none fixed inset-0 z-[9999] hidden md:block" style={{ cursor: "none", visibility: hasMovedRef.current ? "visible" : "hidden" }}>
       {/* Inner dot */}
       <div
         ref={dotRef}
-        className="absolute top-0 left-0 w-2 h-2 rounded-full"
-        style={{ background: "hsl(var(--gold))" }}
+        className="absolute w-2 h-2 rounded-full"
+        style={{ background: "hsl(var(--gold))", left: "-100px", top: "-100px" }}
       />
       {/* Outer ring */}
       <div
         ref={ringRef}
-        className="absolute top-0 left-0 w-9 h-9 rounded-full border-2 animate-rotate-ring"
-        style={{ borderColor: "hsla(42, 88%, 55%, 0.5)" }}
+        className="absolute w-9 h-9 rounded-full border-2 animate-rotate-ring"
+        style={{ borderColor: "hsla(42, 88%, 55%, 0.5)", left: "-100px", top: "-100px" }}
       />
       {/* Trail dots */}
       {Array.from({ length: 5 }).map((_, i) => (
         <div
           key={i}
           ref={(el) => { if (el) trailRefs.current[i] = el; }}
-          className="absolute top-0 left-0 rounded-full"
-          style={{ background: "hsl(var(--gold))" }}
+          className="absolute rounded-full"
+          style={{ background: "hsl(var(--gold))", left: "-100px", top: "-100px" }}
         />
       ))}
     </div>
