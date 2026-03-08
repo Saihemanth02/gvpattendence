@@ -60,8 +60,8 @@ const CustomCursor = () => {
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
-      style={{ cursor: "none", opacity: visible ? 1 : 0 }}
+      className={`pointer-events-none fixed inset-0 z-[9999] md:block ${visible ? 'block' : 'hidden'}`}
+      style={{ cursor: "none" }}
     >
       <div
         ref={dotRef}
