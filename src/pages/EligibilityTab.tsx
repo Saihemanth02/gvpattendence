@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react';
 import { useStudents } from '@/hooks/useStudents';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, Filter, Download, Search } from 'lucide-react';
+import { CheckCircle2, XCircle, Filter, Download, Search, Shield, Users, UserCheck, UserX } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 const SUBJECT_THRESHOLD = 65;
 const OVERALL_THRESHOLD = 75;
@@ -112,30 +113,90 @@ const EligibilityTab = () => {
     URL.revokeObjectURL(url);
   };
 
+  const statCards = [
+    {
+      icon: Users,
+      label: 'TOTAL STUDENTS',
+      value: withData.length,
+      colorClass: 'text-primary',
+      bgClass: 'bg-primary/15',
+      borderClass: 'border-primary/30',
+    },
+    {
+      icon: UserCheck,
+      label: 'ELIGIBLE',
+      value: eligibleCount,
+      colorClass: 'text-accent',
+      bgClass: 'bg-accent/15',
+      borderClass: 'border-accent/30',
+    },
+    {
+      icon: UserX,
+      label: 'NOT ELIGIBLE',
+      value: notEligibleCount,
+      colorClass: 'text-destructive',
+      bgClass: 'bg-destructive/15',
+      borderClass: 'border-destructive/30',
+    },
+  ];
+
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="glass-card p-4 rounded-lg text-center">
-          <p className="text-muted-foreground text-sm font-cormorant">Total Students</p>
-          <p className="text-3xl font-bold font-cinzel text-primary">{withData.length}</p>
+    <div className="p-4 md:p-6 animate-fade-in-up space-y-5">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
+          <Shield className="w-5 h-5 text-primary" />
         </div>
-        <div className="glass-card p-4 rounded-lg text-center">
-          <p className="text-muted-foreground text-sm font-cormorant">Eligible</p>
-          <p className="text-3xl font-bold font-cinzel text-green-500">{eligibleCount}</p>
-        </div>
-        <div className="glass-card p-4 rounded-lg text-center">
-          <p className="text-muted-foreground text-sm font-cormorant">Not Eligible</p>
-          <p className="text-3xl font-bold font-cinzel text-red-400">{notEligibleCount}</p>
+        <div>
+          <h2 className="font-cinzel text-xs tracking-[0.2em] text-primary font-semibold">
+            ELIGIBILITY REPORT
+          </h2>
+          <p className="text-xs text-muted-foreground font-raleway">
+            Subject threshold: {SUBJECT_THRESHOLD}% · Overall threshold: {OVERALL_THRESHOLD}%
+          </p>
         </div>
       </div>
 
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {statCards.map(card => (
+          <div
+            key={card.label}
+            className="glass-card p-4 rounded-xl flex items-center gap-3 hover:scale-[1.02] transition-transform duration-200"
+          >
+            <div className={cn(
+              "w-11 h-11 rounded-xl flex items-center justify-center border",
+              card.bgClass,
+              card.borderClass
+            )}>
+              <card.icon className={cn("w-5 h-5", card.colorClass)} />
+            </div>
+            <div>
+              <p className="text-[0.6rem] font-cinzel tracking-[0.2em] text-muted-foreground uppercase">
+                {card.label}
+              </p>
+              <p className={cn("text-2xl font-cinzel font-bold", card.colorClass)}>
+                {card.value}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Criteria Info */}
-      <div className="glass-card p-4 rounded-lg">
-        <h3 className="font-cinzel text-sm text-primary mb-2">Eligibility Criteria</h3>
-        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-          <span>• Each subject ≥ <strong className="text-foreground">{SUBJECT_THRESHOLD}%</strong></span>
-          <span>• Overall attendance ≥ <strong className="text-foreground">{OVERALL_THRESHOLD}%</strong></span>
+      <div className="glass-card p-4 rounded-xl border-primary/20">
+        <h3 className="font-cinzel text-[0.65rem] tracking-[0.2em] text-primary mb-2 uppercase font-semibold">
+          Eligibility Criteria
+        </h3>
+        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground font-raleway">
+          <span className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+            Each subject ≥ <strong className="text-foreground">{SUBJECT_THRESHOLD}%</strong>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+            Overall attendance ≥ <strong className="text-foreground">{OVERALL_THRESHOLD}%</strong>
+          </span>
         </div>
       </div>
 
@@ -148,85 +209,114 @@ const EligibilityTab = () => {
               placeholder="Search name or reg number..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 w-64 glass-card border-primary/20 text-sm"
+              className="pl-9 w-64 bg-card/70 border-primary/20 text-sm font-raleway focus:border-primary/40"
             />
           </div>
-          <Filter className="w-4 h-4 text-muted-foreground" />
-          <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as 'all' | 'eligible' | 'not-eligible')}>
-            <SelectTrigger className="w-48 glass-card border-primary/20">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Students</SelectItem>
-              <SelectItem value="eligible">Eligible Only</SelectItem>
-              <SelectItem value="not-eligible">Not Eligible Only</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-1.5">
+            <Filter className="w-4 h-4 text-muted-foreground" />
+            <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as 'all' | 'eligible' | 'not-eligible')}>
+              <SelectTrigger className="w-48 bg-card/70 border-primary/20 font-raleway text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Students</SelectItem>
+                <SelectItem value="eligible">Eligible Only</SelectItem>
+                <SelectItem value="not-eligible">Not Eligible Only</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <Button
           onClick={exportCSV}
           variant="outline"
           size="sm"
-          className="border-primary/30 text-primary hover:bg-primary/10 font-cinzel"
+          className="border-primary/30 text-primary hover:bg-primary/10 font-cinzel text-xs tracking-wider"
           disabled={filtered.length === 0}
         >
           <Download className="w-4 h-4 mr-2" />
-          Export CSV
+          EXPORT CSV
         </Button>
       </div>
 
       {/* Student List */}
       <div className="space-y-3">
         {filtered.length === 0 && (
-          <div className="glass-card p-8 rounded-lg text-center text-muted-foreground">
-            No attendance data available yet.
+          <div className="glass-card p-10 rounded-xl text-center">
+            <Shield className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+            <p className="text-muted-foreground font-raleway text-sm">No attendance data available yet.</p>
           </div>
         )}
         {filtered.map(student => (
-          <div key={student.id} className="glass-card p-4 rounded-lg">
+          <div
+            key={student.id}
+            className="glass-card p-4 rounded-xl glass-card-hover transition-all duration-200"
+          >
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="font-cinzel font-semibold text-foreground">{student.name}</p>
-                <p className="text-xs text-muted-foreground">{student.reg_number} · Suffix: {student.suffix}</p>
+                <p className="font-cinzel font-semibold text-foreground text-sm">{student.name}</p>
+                <p className="text-[0.65rem] text-muted-foreground font-raleway tracking-wider">
+                  {student.reg_number} · Suffix: {student.suffix}
+                </p>
               </div>
               <Badge
                 variant={student.isEligible ? 'default' : 'destructive'}
-                className="flex items-center gap-1"
+                className={cn(
+                  "flex items-center gap-1 font-cinzel text-[0.6rem] tracking-wider px-2.5 py-1",
+                  student.isEligible
+                    ? "bg-accent/20 text-accent border border-accent/30 hover:bg-accent/30"
+                    : "bg-destructive/20 text-destructive border border-destructive/30 hover:bg-destructive/30"
+                )}
               >
                 {student.isEligible ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                {student.isEligible ? 'Eligible' : 'Not Eligible'}
+                {student.isEligible ? 'ELIGIBLE' : 'NOT ELIGIBLE'}
               </Badge>
             </div>
 
             {/* Overall */}
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs text-muted-foreground w-16">Overall</span>
-              <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="text-[0.6rem] text-muted-foreground w-16 font-cinzel tracking-wider">OVERALL</span>
+              <div className="flex-1 h-2.5 bg-secondary/30 rounded-full overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all ${student.overallMet ? 'bg-green-500' : 'bg-red-400'}`}
+                  className={cn(
+                    "h-full rounded-full transition-all duration-500",
+                    student.overallMet ? "bg-accent shadow-[0_0_8px_hsl(var(--accent)/0.3)]" : "bg-destructive shadow-[0_0_8px_hsl(var(--destructive)/0.3)]"
+                  )}
                   style={{ width: `${Math.min(student.overallPercent, 100)}%` }}
                 />
               </div>
-              <span className={`text-xs font-medium w-12 text-right ${student.overallMet ? 'text-green-500' : 'text-red-400'}`}>
+              <span className={cn(
+                "text-xs font-bold w-14 text-right font-cinzel",
+                student.overallMet ? "text-accent" : "text-destructive"
+              )}>
                 {student.overallPercent.toFixed(1)}%
               </span>
             </div>
 
             {/* Per Subject */}
-            {student.subjects.map(sub => (
-              <div key={sub.name} className="flex items-center gap-2 mb-1">
-                <span className="text-xs text-muted-foreground w-16 truncate" title={sub.name}>{sub.name}</span>
-                <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all ${sub.meetsThreshold ? 'bg-green-500/70' : 'bg-red-400/70'}`}
-                    style={{ width: `${Math.min(sub.percent, 100)}%` }}
-                  />
+            <div className="space-y-1.5">
+              {student.subjects.map(sub => (
+                <div key={sub.name} className="flex items-center gap-2">
+                  <span className="text-[0.6rem] text-muted-foreground w-16 truncate font-raleway" title={sub.name}>
+                    {sub.name}
+                  </span>
+                  <div className="flex-1 h-1.5 bg-secondary/20 rounded-full overflow-hidden">
+                    <div
+                      className={cn(
+                        "h-full rounded-full transition-all duration-500",
+                        sub.meetsThreshold ? "bg-accent/70" : "bg-destructive/70"
+                      )}
+                      style={{ width: `${Math.min(sub.percent, 100)}%` }}
+                    />
+                  </div>
+                  <span className={cn(
+                    "text-[10px] font-medium w-14 text-right font-raleway",
+                    sub.meetsThreshold ? "text-accent" : "text-destructive"
+                  )}>
+                    {sub.present}/{sub.total} ({sub.percent.toFixed(0)}%)
+                  </span>
                 </div>
-                <span className={`text-[10px] font-medium w-12 text-right ${sub.meetsThreshold ? 'text-green-500' : 'text-red-400'}`}>
-                  {sub.percent.toFixed(1)}%
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         ))}
       </div>
