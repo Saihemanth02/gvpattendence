@@ -35,7 +35,7 @@ const LoginPage = () => {
       <FloatingOrbs />
       <div className="animate-fade-in-up relative z-10 w-full max-w-md mx-4">
         {/* Logo */}
-        <div className="flex flex-col items-center mb-8 w-full">
+        <div className="flex flex-col items-center mb-8 w-full pt-4 md:pt-8">
           <div className="relative mb-6">
             <div className="w-28 h-28 rounded-full border-2 border-primary/30 animate-rotate-ring absolute -inset-2" />
             <img
