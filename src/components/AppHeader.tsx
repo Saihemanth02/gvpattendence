@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 
 const AppHeader = () => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
