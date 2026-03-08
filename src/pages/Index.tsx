@@ -45,6 +45,22 @@ const Index = () => {
     }, 200); // matches fade-out duration
   }, [activeTab]);
 
+  // Keyboard shortcuts: 1-6 to switch tabs
+  useEffect(() => {
+    const tabOrder: TabId[] = ['dashboard', 'mark', 'students', 'history', 'weekly', 'eligibility'];
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore when typing in inputs
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
+      const num = parseInt(e.key);
+      if (num >= 1 && num <= 6) {
+        const tab = tabOrder[num - 1];
+        if (tab) handleTabChange(tab);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleTabChange]);
+
   useEffect(() => {
     return () => clearTimeout(timeoutRef.current);
   }, []);
