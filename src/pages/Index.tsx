@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import SplashScreen from '@/components/SplashScreen';
 import LoginPage from '@/pages/LoginPage';
@@ -48,13 +49,26 @@ const Index = () => {
   // Keyboard shortcuts: 1-6 to switch tabs
   useEffect(() => {
     const tabOrder: TabId[] = ['dashboard', 'mark', 'students', 'history', 'weekly', 'eligibility'];
+    const tabLabels: Record<TabId, string> = {
+      dashboard: 'Dashboard',
+      mark: 'Mark Attendance',
+      students: 'Students',
+      history: 'History',
+      weekly: 'Weekly View',
+      eligibility: 'Eligibility',
+    };
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore when typing in inputs
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
       const num = parseInt(e.key);
       if (num >= 1 && num <= 6) {
         const tab = tabOrder[num - 1];
-        if (tab) handleTabChange(tab);
+        if (tab) {
+          handleTabChange(tab);
+          toast(`Switched to ${tabLabels[tab]}`, {
+            description: `Keyboard shortcut: ${num}`,
+            duration: 1500,
+          });
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
