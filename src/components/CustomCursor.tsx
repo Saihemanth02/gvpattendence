@@ -17,6 +17,7 @@ const CustomCursor = () => {
         ring.current = { x: e.clientX, y: e.clientY };
         trailPositions.current = Array.from({ length: 5 }, () => ({ x: e.clientX, y: e.clientY }));
       }
+    };
 
     let raf: number;
     const animate = () => {
