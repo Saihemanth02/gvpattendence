@@ -35,13 +35,13 @@ const LoginPage = () => {
       <FloatingOrbs />
       <div className="animate-fade-in-up relative z-10 w-full max-w-md mx-4">
         {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="relative mb-4">
-            <div className="w-24 h-24 rounded-full border-2 border-primary/30 animate-rotate-ring absolute -inset-2" />
+        <div className="flex flex-col items-center mb-8 w-full">
+          <div className="relative mb-6">
+            <div className="w-28 h-28 rounded-full border-2 border-primary/30 animate-rotate-ring absolute -inset-2" />
             <img
               src="/gvplogo.jpg"
               alt="GVP Logo"
-              className="w-20 h-20 rounded-full object-cover animate-pulse-gold"
+              className="w-24 h-24 rounded-full object-cover animate-pulse-gold"
               onError={(e) => {
                 const el = e.target as HTMLImageElement;
                 el.style.display = 'none';
@@ -50,8 +50,12 @@ const LoginPage = () => {
             
             <span className="fallback-emblem hidden text-5xl text-primary animate-pulse-gold absolute inset-0 flex items-center justify-center">⚜</span>
           </div>
-          <h1 className="font-cinzel text-3xl font-bold text-primary tracking-wider">Gayatri vidya parishad </h1>
-          <p className="text-[11px] tracking-[0.3em] text-muted-foreground mt-1">ROYAL ATTENDANCE MANAGEMENT</p>
+          <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-primary tracking-wider text-center leading-tight mt-2">
+            Gayatri vidya parishad
+          </h1>
+          <p className="text-[11px] tracking-[0.3em] text-muted-foreground mt-2 text-center">
+            ROYAL ATTENDANCE MANAGEMENT
+          </p>
         </div>
 
         {/* Login Card */}
