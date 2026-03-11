@@ -96,6 +96,11 @@ const Index = () => {
     return <LoginPage />;
   }
 
+  // Students get their own self-service dashboard
+  if (user.role === 'student') {
+    return <StudentDashboard />;
+  }
+
   const ActiveComponent = tabComponent[displayedTab];
 
   return (
