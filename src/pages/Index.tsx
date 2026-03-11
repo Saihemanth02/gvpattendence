@@ -14,6 +14,7 @@ import StudentsTab from '@/pages/StudentsTab';
 import HistoryTab from '@/pages/HistoryTab';
 import WeeklyViewTab from '@/pages/WeeklyViewTab';
 import EligibilityTab from '@/pages/EligibilityTab';
+import StudentDashboard from '@/pages/StudentDashboard';
 
 const tabComponent: Record<TabId, React.FC> = {
   dashboard: DashboardTab,
