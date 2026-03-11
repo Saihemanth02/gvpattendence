@@ -1,54 +1,129 @@
+import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { format, startOfMonth, endOfMonth, subMonths, isWithinInterval, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { TrendingUp, BookOpen, CheckCircle, XCircle, User, Calendar } from 'lucide-react';
+import { TrendingUp, BookOpen, CheckCircle, XCircle, User, Calendar, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import FloatingOrbs from '@/components/FloatingOrbs';
 import SparkleCanvas from '@/components/SparkleCanvas';
 import AppHeader from '@/components/AppHeader';
+import { toast } from 'sonner';
+
+type MonthFilter = 'all' | 'current' | 'previous';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
   const { data: records, isLoading: recordsLoading } = useAttendanceRecords();
   const recordIds = records?.map(r => r.id) || [];
   const { data: entries, isLoading: entriesLoading } = useAttendanceEntries(recordIds);
+  const [monthFilter, setMonthFilter] = useState<MonthFilter>('all');
 
   const isLoading = recordsLoading || entriesLoading;
   const suffix = user?.suffix;
 
-  // Filter entries for this student
-  const myEntries = entries?.filter(e => e.student_suffix === suffix) || [];
+  const now = new Date();
+  const currentMonthStart = startOfMonth(now);
+  const currentMonthEnd = endOfMonth(now);
+  const prevMonthStart = startOfMonth(subMonths(now, 1));
+  const prevMonthEnd = endOfMonth(subMonths(now, 1));
+
+  const filterLabel = monthFilter === 'current'
+    ? format(now, 'MMMM yyyy')
+    : monthFilter === 'previous'
+      ? format(subMonths(now, 1), 'MMMM yyyy')
+      : 'All Time';
+
+  // Filter records by month
+  const filteredRecords = useMemo(() => {
+    if (!records) return [];
+    if (monthFilter === 'all') return records;
+    const start = monthFilter === 'current' ? currentMonthStart : prevMonthStart;
+    const end = monthFilter === 'current' ? currentMonthEnd : prevMonthEnd;
+    return records.filter(r => isWithinInterval(parseISO(r.date), { start, end }));
+  }, [records, monthFilter]);
+
+  const filteredRecordIds = new Set(filteredRecords.map(r => r.id));
+
+  // Filter entries for this student within filtered records
+  const myEntries = useMemo(() => {
+    return (entries?.filter(e => e.student_suffix === suffix && filteredRecordIds.has(e.record_id)) || []);
+  }, [entries, suffix, filteredRecordIds]);
+
   const totalClasses = myEntries.length;
   const presentCount = myEntries.filter(e => e.status === 'present').length;
   const absentCount = myEntries.filter(e => e.status === 'absent').length;
   const percentage = totalClasses > 0 ? Math.round((presentCount / totalClasses) * 100) : 0;
   const isEligible = percentage >= 75;
 
-  // Build per-record detail (most recent first)
-  const myRecordDetails = records
-    ?.map(rec => {
-      const entry = myEntries.find(e => e.record_id === rec.id);
-      if (!entry) return null;
-      return { ...rec, status: entry.status };
-    })
-    .filter(Boolean) || [];
+  // Build per-record detail
+  const myRecordDetails = useMemo(() => {
+    return filteredRecords
+      .map(rec => {
+        const entry = myEntries.find(e => e.record_id === rec.id);
+        if (!entry) return null;
+        return { ...rec, status: entry.status };
+      })
+      .filter(Boolean) as (typeof filteredRecords[number] & { status: string })[];
+  }, [filteredRecords, myEntries]);
 
   // Subject-wise breakdown
-  const subjectMap = new Map<string, { present: number; total: number }>();
-  myEntries.forEach(entry => {
-    const rec = records?.find(r => r.id === entry.record_id);
-    if (!rec) return;
-    const existing = subjectMap.get(rec.subject) || { present: 0, total: 0 };
-    existing.total++;
-    if (entry.status === 'present') existing.present++;
-    subjectMap.set(rec.subject, existing);
-  });
-  const subjectBreakdown = Array.from(subjectMap.entries()).map(([subject, stats]) => ({
-    subject,
-    ...stats,
-    percentage: Math.round((stats.present / stats.total) * 100),
-  }));
+  const subjectBreakdown = useMemo(() => {
+    const subjectMap = new Map<string, { present: number; total: number }>();
+    myEntries.forEach(entry => {
+      const rec = filteredRecords.find(r => r.id === entry.record_id);
+      if (!rec) return;
+      const existing = subjectMap.get(rec.subject) || { present: 0, total: 0 };
+      existing.total++;
+      if (entry.status === 'present') existing.present++;
+      subjectMap.set(rec.subject, existing);
+    });
+    return Array.from(subjectMap.entries()).map(([subject, stats]) => ({
+      subject,
+      ...stats,
+      percentage: Math.round((stats.present / stats.total) * 100),
+    }));
+  }, [myEntries, filteredRecords]);
+
+  // Export CSV
+  const exportCSV = () => {
+    if (myRecordDetails.length === 0) {
+      toast.error('No records to export');
+      return;
+    }
+
+    const header = 'Date,Subject,Section,Period,Status';
+    const rows = myRecordDetails.map(rec =>
+      `${rec.date},${rec.subject},${rec.section},${rec.period},${rec.status}`
+    );
+
+    // Add summary rows
+    const summary = [
+      '',
+      `Filter,${filterLabel}`,
+      `Student,${user?.displayName} (${suffix})`,
+      `Total Classes,${totalClasses}`,
+      `Present,${presentCount}`,
+      `Absent,${absentCount}`,
+      `Attendance %,${percentage}%`,
+      `Eligibility,${isEligible ? 'Eligible' : 'Not Eligible'}`,
+      '',
+      'Subject-wise Breakdown',
+      'Subject,Present,Total,Percentage',
+      ...subjectBreakdown.map(s => `${s.subject},${s.present},${s.total},${s.percentage}%`),
+    ];
+
+    const csv = [header, ...rows, ...summary].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `attendance_${suffix}_${filterLabel.replace(/\s+/g, '_')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${myRecordDetails.length} records`);
+  };
 
   if (isLoading) {
     return (
@@ -89,6 +164,58 @@ const StudentDashboard = () => {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Month Filter & Export */}
+          <div className="glass-card p-4 md:p-5 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-primary" />
+              <span className="text-xs font-cinzel tracking-[0.15em] uppercase text-muted-foreground">View:</span>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant={monthFilter === 'previous' ? 'default' : 'outline'}
+                  size="sm"
+                  className="h-8 text-xs gap-1"
+                  onClick={() => setMonthFilter(f => f === 'previous' ? 'all' : 'previous')}
+                >
+                  <ChevronLeft className="w-3 h-3" />
+                  {format(subMonths(now, 1), 'MMM')}
+                </Button>
+                <Button
+                  variant={monthFilter === 'current' ? 'default' : 'outline'}
+                  size="sm"
+                  className="h-8 text-xs gap-1"
+                  onClick={() => setMonthFilter(f => f === 'current' ? 'all' : 'current')}
+                >
+                  {format(now, 'MMM')}
+                  <ChevronRight className="w-3 h-3" />
+                </Button>
+                <Button
+                  variant={monthFilter === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={() => setMonthFilter('all')}
+                >
+                  All
+                </Button>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs gap-1.5 border-primary/30 text-primary hover:bg-primary/10"
+              onClick={exportCSV}
+            >
+              <Download className="w-3.5 h-3.5" />
+              Export CSV
+            </Button>
+          </div>
+
+          {/* Period Label */}
+          <div className="text-center">
+            <span className="text-xs font-cinzel tracking-[0.2em] uppercase text-muted-foreground">
+              Showing: {filterLabel}
+            </span>
           </div>
 
           {/* Overall Stats */}
@@ -189,16 +316,16 @@ const StudentDashboard = () => {
             </div>
           )}
 
-          {/* Recent Attendance Log */}
+          {/* Attendance Log */}
           <div className="glass-card p-5 md:p-6">
             <h3 className="font-cinzel text-[0.85rem] font-semibold text-primary tracking-[0.2em] mb-4 uppercase">
               Attendance Log
             </h3>
             {myRecordDetails.length === 0 ? (
-              <p className="text-muted-foreground text-sm font-cormorant">No attendance records found.</p>
+              <p className="text-muted-foreground text-sm font-cormorant">No attendance records found for {filterLabel}.</p>
             ) : (
               <div className="space-y-2">
-                {myRecordDetails.slice(0, 20).map((rec: any) => (
+                {myRecordDetails.map((rec) => (
                   <div
                     key={rec.id}
                     className="flex items-center justify-between p-3 rounded-[10px] bg-card/70 border border-primary/10 hover:border-primary/30 transition-all duration-200"
