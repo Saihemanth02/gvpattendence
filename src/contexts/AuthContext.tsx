@@ -1,6 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import { toast } from 'sonner';
+
+const SESSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 interface AuthUser {
   id: string;
@@ -30,6 +33,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<AuthUser | null>(null);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const warningRef = useRef<ReturnType<typeof setTimeout>>();
 
   const fetchProfile = async (sbUser: User) => {
     const { data: profile } = await supabase
@@ -58,11 +63,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setSupabaseUser(null);
+  }, []);
+
+  // Session timeout: auto-logout after 10 min of inactivity
+  const resetSessionTimer = useCallback(() => {
+    clearTimeout(timeoutRef.current);
+    clearTimeout(warningRef.current);
+
+    // Warning at 9 minutes
+    warningRef.current = setTimeout(() => {
+      toast.warning('Session expiring in 1 minute', {
+        description: 'Move your mouse or press a key to stay logged in.',
+        duration: 10000,
+      });
+    }, SESSION_TIMEOUT_MS - 60 * 1000);
+
+    // Auto-logout at 10 minutes
+    timeoutRef.current = setTimeout(() => {
+      toast.error('Session expired', {
+        description: 'You have been logged out due to inactivity.',
+        duration: 5000,
+      });
+      logout();
+    }, SESSION_TIMEOUT_MS);
+  }, [logout]);
+
+  // Attach activity listeners when user is logged in
+  useEffect(() => {
+    if (!user) {
+      clearTimeout(timeoutRef.current);
+      clearTimeout(warningRef.current);
+      return;
+    }
+
+    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+    const handleActivity = () => resetSessionTimer();
+
+    activityEvents.forEach(event => window.addEventListener(event, handleActivity, { passive: true }));
+    resetSessionTimer(); // Start initial timer
+
+    return () => {
+      activityEvents.forEach(event => window.removeEventListener(event, handleActivity));
+      clearTimeout(timeoutRef.current);
+      clearTimeout(warningRef.current);
+    };
+  }, [user, resetSessionTimer]);
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setSupabaseUser(session.user);
-        // Use setTimeout to avoid deadlock with Supabase auth
         setTimeout(() => fetchProfile(session.user), 0);
       } else {
         setSupabaseUser(null);
@@ -89,12 +143,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-  };
-
-  const logout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSupabaseUser(null);
   };
 
   return (
