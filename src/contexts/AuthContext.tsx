@@ -105,6 +105,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) {
       clearTimeout(timeoutRef.current);
       clearTimeout(warningRef.current);
+      clearInterval(tickRef.current);
+      setSessionRemaining(SESSION_TIMEOUT_MS / 1000);
       return;
     }
 
@@ -112,12 +114,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleActivity = () => resetSessionTimer();
 
     activityEvents.forEach(event => window.addEventListener(event, handleActivity, { passive: true }));
-    resetSessionTimer(); // Start initial timer
+    resetSessionTimer();
+
+    // Tick every second to update remaining time
+    tickRef.current = setInterval(() => {
+      const remaining = Math.max(0, Math.round((deadlineRef.current - Date.now()) / 1000));
+      setSessionRemaining(remaining);
+    }, TICK_INTERVAL_MS);
 
     return () => {
       activityEvents.forEach(event => window.removeEventListener(event, handleActivity));
       clearTimeout(timeoutRef.current);
       clearTimeout(warningRef.current);
+      clearInterval(tickRef.current);
     };
   }, [user, resetSessionTimer]);
 
