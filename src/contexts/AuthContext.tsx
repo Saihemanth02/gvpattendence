@@ -4,6 +4,7 @@ import type { User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 
 const SESSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+const TICK_INTERVAL_MS = 1000;
 
 interface AuthUser {
   id: string;
@@ -17,6 +18,7 @@ interface AuthContextType {
   user: AuthUser | null;
   supabaseUser: User | null;
   loading: boolean;
+  sessionRemaining: number; // seconds remaining
   login: (username: string, password: string, role: 'faculty' | 'student') => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -33,8 +35,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<AuthUser | null>(null);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionRemaining, setSessionRemaining] = useState(SESSION_TIMEOUT_MS / 1000);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const warningRef = useRef<ReturnType<typeof setTimeout>>();
+  const tickRef = useRef<ReturnType<typeof setInterval>>();
+  const deadlineRef = useRef<number>(Date.now() + SESSION_TIMEOUT_MS);
 
   const fetchProfile = async (sbUser: User) => {
     const { data: profile } = await supabase
@@ -74,6 +79,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     clearTimeout(timeoutRef.current);
     clearTimeout(warningRef.current);
 
+    deadlineRef.current = Date.now() + SESSION_TIMEOUT_MS;
+    setSessionRemaining(SESSION_TIMEOUT_MS / 1000);
+
     // Warning at 9 minutes
     warningRef.current = setTimeout(() => {
       toast.warning('Session expiring in 1 minute', {
@@ -97,6 +105,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) {
       clearTimeout(timeoutRef.current);
       clearTimeout(warningRef.current);
+      clearInterval(tickRef.current);
+      setSessionRemaining(SESSION_TIMEOUT_MS / 1000);
       return;
     }
 
@@ -104,12 +114,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleActivity = () => resetSessionTimer();
 
     activityEvents.forEach(event => window.addEventListener(event, handleActivity, { passive: true }));
-    resetSessionTimer(); // Start initial timer
+    resetSessionTimer();
+
+    // Tick every second to update remaining time
+    tickRef.current = setInterval(() => {
+      const remaining = Math.max(0, Math.round((deadlineRef.current - Date.now()) / 1000));
+      setSessionRemaining(remaining);
+    }, TICK_INTERVAL_MS);
 
     return () => {
       activityEvents.forEach(event => window.removeEventListener(event, handleActivity));
       clearTimeout(timeoutRef.current);
       clearTimeout(warningRef.current);
+      clearInterval(tickRef.current);
     };
   }, [user, resetSessionTimer]);
 
@@ -146,7 +163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, supabaseUser, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, supabaseUser, loading, sessionRemaining, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
