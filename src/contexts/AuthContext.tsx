@@ -4,6 +4,7 @@ import type { User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 
 const SESSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+const TICK_INTERVAL_MS = 1000;
 
 interface AuthUser {
   id: string;
