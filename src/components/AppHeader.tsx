@@ -89,8 +89,23 @@ const AppHeader = () => {
         </span>
       </div>
 
-      {/* RIGHT: Shortcuts + Theme toggle + Avatar + Logout */}
+      {/* RIGHT: Session timer + Shortcuts + Theme toggle + Avatar + Logout */}
       <div className="flex items-center gap-2 md:gap-3">
+        {/* Session countdown */}
+        <div
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-mono-num transition-all duration-300",
+            isUrgent
+              ? "border-destructive/50 bg-destructive/10 text-destructive animate-pulse"
+              : "border-primary/25 bg-secondary/40 text-muted-foreground"
+          )}
+          title="Session time remaining"
+        >
+          <Timer className={cn("w-3.5 h-3.5", isUrgent ? "text-destructive" : "text-primary/60")} />
+          <span className={cn("tabular-nums", isUrgent && "font-semibold")}>
+            {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+          </span>
+        </div>
         {/* Shortcuts button (desktop only) */}
         <div className="relative hidden md:block" ref={popoverRef}>
           <button
