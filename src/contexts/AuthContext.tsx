@@ -18,6 +18,7 @@ interface AuthContextType {
   user: AuthUser | null;
   supabaseUser: User | null;
   loading: boolean;
+  sessionRemaining: number; // seconds remaining
   login: (username: string, password: string, role: 'faculty' | 'student') => Promise<void>;
   logout: () => Promise<void>;
 }
