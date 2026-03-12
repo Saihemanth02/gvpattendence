@@ -35,8 +35,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<AuthUser | null>(null);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionRemaining, setSessionRemaining] = useState(SESSION_TIMEOUT_MS / 1000);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const warningRef = useRef<ReturnType<typeof setTimeout>>();
+  const tickRef = useRef<ReturnType<typeof setInterval>>();
+  const deadlineRef = useRef<number>(Date.now() + SESSION_TIMEOUT_MS);
 
   const fetchProfile = async (sbUser: User) => {
     const { data: profile } = await supabase
