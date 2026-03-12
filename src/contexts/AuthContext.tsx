@@ -79,6 +79,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     clearTimeout(timeoutRef.current);
     clearTimeout(warningRef.current);
 
+    deadlineRef.current = Date.now() + SESSION_TIMEOUT_MS;
+    setSessionRemaining(SESSION_TIMEOUT_MS / 1000);
+
     // Warning at 9 minutes
     warningRef.current = setTimeout(() => {
       toast.warning('Session expiring in 1 minute', {
