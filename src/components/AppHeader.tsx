@@ -98,14 +98,45 @@ const AppHeader = () => {
         {/* Session countdown */}
         <div
           className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-mono-num transition-all duration-300",
+            "flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-xs font-mono-num transition-all duration-300",
             isUrgent
               ? "border-destructive/50 bg-destructive/10 text-destructive animate-pulse"
               : "border-primary/25 bg-secondary/40 text-muted-foreground"
           )}
           title="Session time remaining"
         >
-          <Timer className={cn("w-3.5 h-3.5", isUrgent ? "text-destructive" : "text-primary/60")} />
+          {/* Circular progress indicator */}
+          <svg width="28" height="28" className="flex-shrink-0 -rotate-90">
+            <circle
+              cx="14" cy="14" r="13"
+              fill="none"
+              strokeWidth="2"
+              className={cn(isUrgent ? "stroke-destructive/20" : "stroke-primary/15")}
+            />
+            <circle
+              cx="14" cy="14" r="13"
+              fill="none"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              className={cn(
+                "transition-all duration-1000",
+                isUrgent ? "stroke-destructive" : "stroke-primary/70"
+              )}
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+            />
+            <text
+              x="14" y="14"
+              textAnchor="middle"
+              dominantBaseline="central"
+              className={cn(
+                "fill-current text-[6px] font-bold rotate-90 origin-center",
+                isUrgent ? "fill-destructive" : "fill-primary/70"
+              )}
+            >
+              {minutes}m
+            </text>
+          </svg>
           <span className={cn("tabular-nums", isUrgent && "font-semibold")}>
             {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
           </span>
