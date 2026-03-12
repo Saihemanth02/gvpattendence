@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { LogOut, Clock, Sun, Moon, Keyboard, Timer } from 'lucide-react';
+import { LogOut, Clock, Sun, Moon, Keyboard } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -59,6 +59,10 @@ const AppHeader = () => {
   const seconds = sessionRemaining % 60;
   const isUrgent = sessionRemaining <= 60;
 
+  const sessionProgress = sessionRemaining / (10 * 60); // 0 to 1
+  const circumference = 2 * Math.PI * 13; // radius 13
+  const strokeDashoffset = circumference * (1 - sessionProgress);
+
   return (
     <header className="h-[70px] bg-background/95 backdrop-blur-md border-b border-primary/20 px-4 md:px-6 flex items-center justify-between relative z-10">
       {/* LEFT: Logo + Title */}
@@ -94,14 +98,45 @@ const AppHeader = () => {
         {/* Session countdown */}
         <div
           className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-mono-num transition-all duration-300",
+            "flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-xs font-mono-num transition-all duration-300",
             isUrgent
               ? "border-destructive/50 bg-destructive/10 text-destructive animate-pulse"
               : "border-primary/25 bg-secondary/40 text-muted-foreground"
           )}
           title="Session time remaining"
         >
-          <Timer className={cn("w-3.5 h-3.5", isUrgent ? "text-destructive" : "text-primary/60")} />
+          {/* Circular progress indicator */}
+          <svg width="28" height="28" className="flex-shrink-0 -rotate-90">
+            <circle
+              cx="14" cy="14" r="13"
+              fill="none"
+              strokeWidth="2"
+              className={cn(isUrgent ? "stroke-destructive/20" : "stroke-primary/15")}
+            />
+            <circle
+              cx="14" cy="14" r="13"
+              fill="none"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              className={cn(
+                "transition-all duration-1000",
+                isUrgent ? "stroke-destructive" : "stroke-primary/70"
+              )}
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+            />
+            <text
+              x="14" y="14"
+              textAnchor="middle"
+              dominantBaseline="central"
+              className={cn(
+                "fill-current text-[6px] font-bold rotate-90 origin-center",
+                isUrgent ? "fill-destructive" : "fill-primary/70"
+              )}
+            >
+              {minutes}m
+            </text>
+          </svg>
           <span className={cn("tabular-nums", isUrgent && "font-semibold")}>
             {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
           </span>
