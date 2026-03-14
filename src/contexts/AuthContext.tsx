@@ -1,6 +1,9 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import { toast } from 'sonner';
+
+const SESSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 interface AuthUser {
   id: string;
@@ -14,6 +17,7 @@ interface AuthContextType {
   user: AuthUser | null;
   supabaseUser: User | null;
   loading: boolean;
+  sessionRemaining: number;
   login: (username: string, password: string, role: 'faculty' | 'student') => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -30,6 +34,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<AuthUser | null>(null);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionRemaining, setSessionRemaining] = useState(SESSION_TIMEOUT_MS / 1000);
+  const deadlineRef = useRef<number>(Date.now() + SESSION_TIMEOUT_MS);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const tickRef = useRef<ReturnType<typeof setInterval>>();
 
   const fetchProfile = async (sbUser: User) => {
     const { data: profile } = await supabase
@@ -64,6 +72,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSupabaseUser(null);
   }, []);
 
+  // Fixed 10-minute session timer — no reset on activity
+  useEffect(() => {
+    if (!user) {
+      clearTimeout(timeoutRef.current);
+      clearInterval(tickRef.current);
+      setSessionRemaining(SESSION_TIMEOUT_MS / 1000);
+      return;
+    }
+
+    deadlineRef.current = Date.now() + SESSION_TIMEOUT_MS;
+    setSessionRemaining(SESSION_TIMEOUT_MS / 1000);
+
+    // Auto-logout after 10 minutes
+    timeoutRef.current = setTimeout(() => {
+      toast.error('Session expired', {
+        description: 'You have been logged out. Please log in again.',
+        duration: 5000,
+      });
+      logout();
+    }, SESSION_TIMEOUT_MS);
+
+    // Tick every second to update countdown
+    tickRef.current = setInterval(() => {
+      const remaining = Math.max(0, Math.round((deadlineRef.current - Date.now()) / 1000));
+      setSessionRemaining(remaining);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeoutRef.current);
+      clearInterval(tickRef.current);
+    };
+  }, [user, logout]);
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
@@ -97,7 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, supabaseUser, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, supabaseUser, loading, sessionRemaining, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
