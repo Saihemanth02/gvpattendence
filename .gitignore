@@ -1,3 +1,7 @@
+# Lock files (corrupted in main branch)
+package-lock.json
+pnpm-lock.yaml
+
 # Logs
 logs
 *.log
