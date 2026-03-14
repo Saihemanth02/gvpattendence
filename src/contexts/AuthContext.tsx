@@ -51,61 +51,6 @@ interface AuthContextType {
     setSupabaseUser(null);
   }, []);
 
-  // Session timeout: auto-logout after 10 min of inactivity
-  const resetSessionTimer = useCallback(() => {
-    clearTimeout(timeoutRef.current);
-    clearTimeout(warningRef.current);
-
-    deadlineRef.current = Date.now() + SESSION_TIMEOUT_MS;
-    setSessionRemaining(SESSION_TIMEOUT_MS / 1000);
-
-    // Warning at 9 minutes
-    warningRef.current = setTimeout(() => {
-      toast.warning('Session expiring in 1 minute', {
-        description: 'Move your mouse or press a key to stay logged in.',
-        duration: 10000,
-      });
-    }, SESSION_TIMEOUT_MS - 60 * 1000);
-
-    // Auto-logout at 10 minutes
-    timeoutRef.current = setTimeout(() => {
-      toast.error('Session expired', {
-        description: 'You have been logged out due to inactivity.',
-        duration: 5000,
-      });
-      logout();
-    }, SESSION_TIMEOUT_MS);
-  }, [logout]);
-
-  // Attach activity listeners when user is logged in
-  useEffect(() => {
-    if (!user) {
-      clearTimeout(timeoutRef.current);
-      clearTimeout(warningRef.current);
-      clearInterval(tickRef.current);
-      setSessionRemaining(SESSION_TIMEOUT_MS / 1000);
-      return;
-    }
-
-    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'];
-    const handleActivity = () => resetSessionTimer();
-
-    activityEvents.forEach(event => window.addEventListener(event, handleActivity, { passive: true }));
-    resetSessionTimer();
-
-    // Tick every second to update remaining time
-    tickRef.current = setInterval(() => {
-      const remaining = Math.max(0, Math.round((deadlineRef.current - Date.now()) / 1000));
-      setSessionRemaining(remaining);
-    }, TICK_INTERVAL_MS);
-
-    return () => {
-      activityEvents.forEach(event => window.removeEventListener(event, handleActivity));
-      clearTimeout(timeoutRef.current);
-      clearTimeout(warningRef.current);
-      clearInterval(tickRef.current);
-    };
-  }, [user, resetSessionTimer]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
