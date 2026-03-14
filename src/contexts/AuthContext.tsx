@@ -1,10 +1,6 @@
-import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
-import { toast } from 'sonner';
-
-const SESSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
-const TICK_INTERVAL_MS = 1000;
 
 interface AuthUser {
   id: string;
@@ -18,28 +14,9 @@ interface AuthContextType {
   user: AuthUser | null;
   supabaseUser: User | null;
   loading: boolean;
-  sessionRemaining: number; // seconds remaining
   login: (username: string, password: string, role: 'faculty' | 'student') => Promise<void>;
   logout: () => Promise<void>;
 }
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
-};
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [sessionRemaining, setSessionRemaining] = useState(SESSION_TIMEOUT_MS / 1000);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
-  const warningRef = useRef<ReturnType<typeof setTimeout>>();
-  const tickRef = useRef<ReturnType<typeof setInterval>>();
-  const deadlineRef = useRef<number>(Date.now() + SESSION_TIMEOUT_MS);
 
   const fetchProfile = async (sbUser: User) => {
     const { data: profile } = await supabase
