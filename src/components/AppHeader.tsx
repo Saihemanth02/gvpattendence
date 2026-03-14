@@ -54,7 +54,13 @@ const AppHeader = () => {
     .join('')
     .slice(0, 2)
     .toUpperCase() || '?';
+  const minutes = Math.floor(sessionRemaining / 60);
+  const seconds = sessionRemaining % 60;
+  const isUrgent = sessionRemaining <= 60;
 
+  const sessionProgress = sessionRemaining / (10 * 60);
+  const circumference = 2 * Math.PI * 13;
+  const strokeDashoffset = circumference * (1 - sessionProgress);
 
   return (
     <header className="h-[70px] bg-background/95 backdrop-blur-md border-b border-primary/20 px-4 md:px-6 flex items-center justify-between relative z-10">
