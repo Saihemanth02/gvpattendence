@@ -3,11 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "preinstall": "node -e \"try{require('fs').unlinkSync('package-lock.json')}catch(e){}\"",
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
