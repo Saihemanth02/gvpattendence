@@ -15,7 +15,7 @@ const shortcuts = [
 ];
 
 const AppHeader = () => {
-  const { user, logout, sessionRemaining } = useAuth();
+  const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [time, setTime] = useState(new Date());
   const [showShortcuts, setShowShortcuts] = useState(false);
