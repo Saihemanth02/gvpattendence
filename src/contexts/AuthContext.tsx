@@ -18,6 +18,19 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  return ctx;
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const fetchProfile = async (sbUser: User) => {
     const { data: profile } = await supabase
       .from('profiles')
@@ -50,7 +63,6 @@ interface AuthContextType {
     setUser(null);
     setSupabaseUser(null);
   }, []);
-
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
