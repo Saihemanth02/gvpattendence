@@ -85,7 +85,7 @@ interface AuthContextType {
   };
 
   return (
-    <AuthContext.Provider value={{ user, supabaseUser, loading, sessionRemaining, login, logout }}>
+    <AuthContext.Provider value={{ user, supabaseUser, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
