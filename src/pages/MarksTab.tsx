@@ -21,9 +21,18 @@ const MarksTab = () => {
 
   const { data: students } = useStudents(section || undefined);
   const { data: marks, isLoading } = useMarks(section || undefined, subject || undefined);
+  const { data: markSubjects } = useMarkSubjects(section || undefined);
+  const { data: attendanceSubjects } = useAttendanceSubjects(section || undefined);
   const upsertMark = useUpsertMark();
   const bulkUpsert = useBulkUpsertMarks();
   const deleteMark = useDeleteMark();
+
+  const subjectSuggestions = useMemo(() => {
+    const all = new Set([...(markSubjects || []), ...(attendanceSubjects || [])]);
+    const list = [...all].sort();
+    if (!subject) return list;
+    return list.filter(s => s.toLowerCase().includes(subject.toLowerCase()));
+  }, [markSubjects, attendanceSubjects, subject]);
 
   const studentMap = useMemo(() => {
     const map: Record<string, string> = {};
