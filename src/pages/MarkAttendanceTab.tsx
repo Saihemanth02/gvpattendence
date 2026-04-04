@@ -16,6 +16,8 @@ const MarkAttendanceTab = ({ selectedSection }: { selectedSection: string }) => 
   const [period, setPeriod] = useState<number | null>(null);
   const [absentText, setAbsentText] = useState('');
 
+  useEffect(() => { setSection(selectedSection); setAbsentText(''); }, [selectedSection]);
+
   const { data: students } = useStudents(section || undefined);
   const submitMutation = useSubmitAttendance();
 

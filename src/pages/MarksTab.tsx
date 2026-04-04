@@ -19,6 +19,8 @@ const MarksTab = ({ selectedSection }: { selectedSection: string }) => {
   const [newMid2, setNewMid2] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => { setSection(selectedSection); }, [selectedSection]);
+
   const { data: students } = useStudents(section || undefined);
   const { data: marks, isLoading } = useMarks(section || undefined, subject || undefined);
   const { data: markSubjects } = useMarkSubjects(section || undefined);
