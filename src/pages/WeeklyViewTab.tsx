@@ -18,8 +18,13 @@ const WeeklyViewTab = () => {
     return eachDayOfInterval({ start, end }).slice(0, 5);
   }, []);
 
+  const filteredRecords = useMemo(() => {
+    if (!sectionFilter) return records;
+    return records?.filter(r => r.section === sectionFilter);
+  }, [records, sectionFilter]);
+
   const getRecord = (day: Date, period: number) => {
-    return records?.find(r => isSameDay(new Date(r.date), day) && r.period === period);
+    return filteredRecords?.find(r => isSameDay(new Date(r.date), day) && r.period === period);
   };
 
   const totalSlots = weekDays.length * PERIODS.length;
