@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useStudents, useSections, useAddStudent, useRemoveStudent } from '@/hooks/useStudents';
+import { useStudents, useSections, useAddStudent, useRemoveStudent, COURSE_SECTIONS, ALL_SECTIONS } from '@/hooks/useStudents';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { useAuth } from '@/contexts/AuthContext';
 import { Search, Users, ChevronDown, ChevronUp, Plus, Trash2, X } from 'lucide-react';
@@ -77,7 +77,7 @@ const StudentsTab = () => {
     );
   }
 
-  const allSections = sections || ['MCA'];
+  
 
   return (
     <div className="p-4 md:p-6 animate-fade-in-up max-w-[1200px] mx-auto">
@@ -110,32 +110,63 @@ const StudentsTab = () => {
         </div>
 
         {/* Section Filter */}
-        <div className="flex gap-2 flex-wrap mb-4">
-          <button
-            onClick={() => setSelectedSection('')}
-            className={cn(
-              "px-4 py-1.5 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
-              !selectedSection
-                ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
-                : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
-            )}
-          >
-            ALL
-          </button>
-          {allSections.map(sec => (
+        <div className="mb-4 space-y-3">
+          {/* Category tabs */}
+          <div className="flex gap-2 flex-wrap">
             <button
-              key={sec}
-              onClick={() => setSelectedSection(sec)}
+              onClick={() => setSelectedSection('')}
               className={cn(
                 "px-4 py-1.5 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
-                selectedSection === sec
+                !selectedSection
                   ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
                   : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
               )}
             >
-              {sec}
+              ALL
             </button>
-          ))}
+          </div>
+
+          {/* PG Section */}
+          <div>
+            <p className="text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase mb-1.5">Postgraduate (PG)</p>
+            <div className="flex gap-2 flex-wrap">
+              {COURSE_SECTIONS.PG.map(sec => (
+                <button
+                  key={sec}
+                  onClick={() => setSelectedSection(sec)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
+                    selectedSection === sec
+                      ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
+                      : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+                  )}
+                >
+                  {sec}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* UG Section */}
+          <div>
+            <p className="text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase mb-1.5">Undergraduate (UG)</p>
+            <div className="flex gap-2 flex-wrap">
+              {COURSE_SECTIONS.UG.map(sec => (
+                <button
+                  key={sec}
+                  onClick={() => setSelectedSection(sec)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
+                    selectedSection === sec
+                      ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
+                      : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+                  )}
+                >
+                  {sec}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Add Student Form */}
@@ -164,13 +195,18 @@ const StudentsTab = () => {
                 placeholder="Full Name"
                 className="bg-background/50 border border-primary/10 rounded-[8px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-all"
               />
-              <input
-                type="text"
+              <select
                 value={newStudent.section}
                 onChange={e => setNewStudent(s => ({ ...s, section: e.target.value }))}
-                placeholder="Section (e.g. MCA)"
-                className="bg-background/50 border border-primary/10 rounded-[8px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-all"
-              />
+                className="bg-background/50 border border-primary/10 rounded-[8px] px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 transition-all"
+              >
+                <optgroup label="Postgraduate (PG)">
+                  {COURSE_SECTIONS.PG.map(sec => <option key={sec} value={sec}>{sec}</option>)}
+                </optgroup>
+                <optgroup label="Undergraduate (UG)">
+                  {COURSE_SECTIONS.UG.map(sec => <option key={sec} value={sec}>{sec}</option>)}
+                </optgroup>
+              </select>
             </div>
             <button
               onClick={handleAdd}
