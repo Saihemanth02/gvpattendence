@@ -1,20 +1,29 @@
 import { useState, useMemo } from 'react';
-import { useStudents } from '@/hooks/useStudents';
+import { useStudents, useSections, useAddStudent, useRemoveStudent } from '@/hooks/useStudents';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, Users, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Users, ChevronDown, ChevronUp, Plus, Trash2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const StudentsTab = () => {
   const { user } = useAuth();
-  const { data: students, isLoading: studentsLoading } = useStudents();
+  const { data: sections } = useSections();
+  const [selectedSection, setSelectedSection] = useState<string>('');
+  const { data: students, isLoading: studentsLoading } = useStudents(selectedSection || undefined);
   const { data: records } = useAttendanceRecords();
   const recordIds = records?.map(r => r.id) || [];
   const { data: entries } = useAttendanceEntries(recordIds);
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState<'name' | 'pct'>('name');
   const [sortAsc, setSortAsc] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newStudent, setNewStudent] = useState({ suffix: '', reg_number: '', name: '', section: 'MCA' });
+
+  const addMutation = useAddStudent();
+  const removeMutation = useRemoveStudent();
+
+  const isFaculty = user?.role === 'faculty';
 
   const studentStats = useMemo(() => {
     if (!students || !entries) return [];
@@ -50,6 +59,16 @@ const StudentsTab = () => {
       : null
   );
 
+  const handleAdd = () => {
+    if (!newStudent.suffix || !newStudent.reg_number || !newStudent.name || !newStudent.section) return;
+    addMutation.mutate(newStudent, {
+      onSuccess: () => {
+        setNewStudent({ suffix: '', reg_number: '', name: '', section: selectedSection || 'MCA' });
+        setShowAddForm(false);
+      }
+    });
+  };
+
   if (studentsLoading) {
     return (
       <div className="p-4 md:p-6 space-y-3 max-w-[1200px] mx-auto">
@@ -57,6 +76,8 @@ const StudentsTab = () => {
       </div>
     );
   }
+
+  const allSections = sections || ['MCA'];
 
   return (
     <div className="p-4 md:p-6 animate-fade-in-up max-w-[1200px] mx-auto">
@@ -69,10 +90,97 @@ const StudentsTab = () => {
             </div>
             <div>
               <h2 className="font-cinzel text-[0.85rem] font-semibold text-primary tracking-[0.2em] uppercase">Students</h2>
-              <p className="text-[0.6rem] text-muted-foreground tracking-[0.15em] uppercase">{studentStats.length} records</p>
+              <p className="text-[0.6rem] text-muted-foreground tracking-[0.15em] uppercase">{studentStats.length} records{selectedSection ? ` · ${selectedSection}` : ''}</p>
             </div>
           </div>
+          {isFaculty && (
+            <button
+              onClick={() => { setShowAddForm(!showAddForm); setNewStudent(s => ({ ...s, section: selectedSection || 'MCA' })); }}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-2 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
+                showAddForm
+                  ? "bg-destructive/10 border-destructive/30 text-destructive"
+                  : "bg-primary/10 border-primary/30 text-primary hover:bg-primary/20"
+              )}
+            >
+              {showAddForm ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+              {showAddForm ? 'Cancel' : 'Add Student'}
+            </button>
+          )}
         </div>
+
+        {/* Section Filter */}
+        <div className="flex gap-2 flex-wrap mb-4">
+          <button
+            onClick={() => setSelectedSection('')}
+            className={cn(
+              "px-4 py-1.5 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
+              !selectedSection
+                ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
+                : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+            )}
+          >
+            ALL
+          </button>
+          {allSections.map(sec => (
+            <button
+              key={sec}
+              onClick={() => setSelectedSection(sec)}
+              className={cn(
+                "px-4 py-1.5 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
+                selectedSection === sec
+                  ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
+                  : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+              )}
+            >
+              {sec}
+            </button>
+          ))}
+        </div>
+
+        {/* Add Student Form */}
+        {showAddForm && isFaculty && (
+          <div className="mb-5 p-4 rounded-[10px] bg-card/70 border border-primary/15 space-y-3 animate-fade-in-up">
+            <h3 className="font-cinzel text-[0.7rem] text-primary tracking-[0.15em] uppercase font-semibold">Add New Student</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              <input
+                type="text"
+                value={newStudent.suffix}
+                onChange={e => setNewStudent(s => ({ ...s, suffix: e.target.value }))}
+                placeholder="Suffix (e.g. 060)"
+                className="bg-background/50 border border-primary/10 rounded-[8px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-all font-mono-num"
+              />
+              <input
+                type="text"
+                value={newStudent.reg_number}
+                onChange={e => setNewStudent(s => ({ ...s, reg_number: e.target.value }))}
+                placeholder="Reg Number"
+                className="bg-background/50 border border-primary/10 rounded-[8px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-all font-mono-num"
+              />
+              <input
+                type="text"
+                value={newStudent.name}
+                onChange={e => setNewStudent(s => ({ ...s, name: e.target.value }))}
+                placeholder="Full Name"
+                className="bg-background/50 border border-primary/10 rounded-[8px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-all"
+              />
+              <input
+                type="text"
+                value={newStudent.section}
+                onChange={e => setNewStudent(s => ({ ...s, section: e.target.value }))}
+                placeholder="Section (e.g. MCA)"
+                className="bg-background/50 border border-primary/10 rounded-[8px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-all"
+              />
+            </div>
+            <button
+              onClick={handleAdd}
+              disabled={addMutation.isPending || !newStudent.suffix || !newStudent.name || !newStudent.reg_number || !newStudent.section}
+              className="px-5 py-2 rounded-[10px] bg-gradient-to-r from-gold-dark via-primary to-gold-light text-primary-foreground font-cinzel text-xs tracking-[0.15em] font-bold hover:shadow-[0_0_20px_hsla(42,88%,55%,0.25)] transition-all disabled:opacity-40"
+            >
+              {addMutation.isPending ? 'Adding...' : 'ADD STUDENT'}
+            </button>
+          </div>
+        )}
 
         {/* Search */}
         <div className="relative mb-5">
@@ -99,6 +207,7 @@ const StudentsTab = () => {
                 >
                   Name <SortIcon field="name" />
                 </th>
+                {!selectedSection && <th className="text-center py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase">Section</th>}
                 <th className="text-center py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase">Classes</th>
                 <th className="text-center py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase">Present</th>
                 <th
@@ -108,6 +217,7 @@ const StudentsTab = () => {
                   Attendance <SortIcon field="pct" />
                 </th>
                 <th className="text-center py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase">Status</th>
+                {isFaculty && <th className="text-center py-3 px-3 text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase"></th>}
               </tr>
             </thead>
             <tbody>
@@ -116,6 +226,7 @@ const StudentsTab = () => {
                   <td className="py-3.5 px-3 font-mono-num text-muted-foreground text-xs">{s.suffix}</td>
                   <td className="py-3.5 px-3 font-mono-num text-xs text-foreground/80">{s.reg_number}</td>
                   <td className="py-3.5 px-3 text-foreground font-medium">{s.name}</td>
+                  {!selectedSection && <td className="py-3.5 px-3 text-center text-xs font-cinzel text-muted-foreground">{s.section}</td>}
                   <td className="py-3.5 px-3 text-center font-mono-num text-muted-foreground">{s.total}</td>
                   <td className="py-3.5 px-3 text-center font-mono-num text-[hsl(150,50%,48%)]">{s.present}</td>
                   <td className="py-3.5 px-3">
@@ -142,6 +253,18 @@ const StudentsTab = () => {
                       {s.pct >= 75 ? '✓ GOOD' : '⚠ LOW'}
                     </span>
                   </td>
+                  {isFaculty && (
+                    <td className="py-3.5 px-3 text-center">
+                      <button
+                        onClick={() => removeMutation.mutate(s.id)}
+                        disabled={removeMutation.isPending}
+                        className="p-1.5 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all"
+                        title="Remove student"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
