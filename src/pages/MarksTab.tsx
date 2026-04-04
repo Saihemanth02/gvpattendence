@@ -10,6 +10,7 @@ import { Upload, Trash2, Save, FileSpreadsheet, Plus } from 'lucide-react';
 const MarksTab = () => {
   const [section, setSection] = useState('');
   const [subject, setSubject] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editMid1, setEditMid1] = useState('');
   const [editMid2, setEditMid2] = useState('');
