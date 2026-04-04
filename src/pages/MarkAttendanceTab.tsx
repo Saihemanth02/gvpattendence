@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useStudents, STUDENT_SEED_DATA } from '@/hooks/useStudents';
+import { useStudents, COURSE_SECTIONS } from '@/hooks/useStudents';
 import { useSubmitAttendance } from '@/hooks/useAttendance';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -7,23 +7,22 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, Send, CheckCircle, XCircle } from 'lucide-react';
 
-const SECTIONS = ['A', 'B', 'CSE', 'MCA'];
 const PERIODS = [1, 2, 3, 4, 5, 6, 7];
 
 const MarkAttendanceTab = () => {
-  const { data: students } = useStudents();
-  const submitMutation = useSubmitAttendance();
-
   const [subject, setSubject] = useState('');
   const [section, setSection] = useState('');
   const [date, setDate] = useState<Date>(new Date());
   const [period, setPeriod] = useState<number | null>(null);
   const [absentText, setAbsentText] = useState('');
 
-  const allSuffixes = useMemo(() => (students || STUDENT_SEED_DATA).map(s => s.suffix), [students]);
+  const { data: students } = useStudents(section || undefined);
+  const submitMutation = useSubmitAttendance();
+
+  const allSuffixes = useMemo(() => (students || []).map(s => s.suffix), [students]);
   const studentMap = useMemo(() => {
     const map: Record<string, string> = {};
-    (students || STUDENT_SEED_DATA).forEach(s => { map[s.suffix] = s.name; });
+    (students || []).forEach(s => { map[s.suffix] = s.name; });
     return map;
   }, [students]);
 
@@ -77,14 +76,36 @@ const MarkAttendanceTab = () => {
 
         {/* Section */}
         <div>
-          <label className="text-[0.65rem] text-muted-foreground font-cinzel tracking-[0.2em] mb-2 block uppercase">Section</label>
-          <div className="flex gap-2 flex-wrap">
-            {SECTIONS.map(s => (
+          <label className="text-[0.65rem] text-muted-foreground font-cinzel tracking-[0.2em] mb-2 block uppercase">Course / Section</label>
+          
+          {/* PG */}
+          <p className="text-[0.55rem] text-muted-foreground/70 font-cinzel tracking-[0.15em] uppercase mb-1.5 mt-1">Postgraduate (PG)</p>
+          <div className="flex gap-2 flex-wrap mb-3">
+            {COURSE_SECTIONS.PG.map(s => (
               <button
                 key={s}
-                onClick={() => setSection(s)}
+                onClick={() => { setSection(s); setAbsentText(''); }}
                 className={cn(
-                  "px-5 py-2 rounded-[10px] text-sm font-cinzel border transition-all duration-200",
+                  "px-4 py-2 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
+                  section === s
+                    ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
+                    : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+                )}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
+          {/* UG */}
+          <p className="text-[0.55rem] text-muted-foreground/70 font-cinzel tracking-[0.15em] uppercase mb-1.5">Undergraduate (UG)</p>
+          <div className="flex gap-2 flex-wrap">
+            {COURSE_SECTIONS.UG.map(s => (
+              <button
+                key={s}
+                onClick={() => { setSection(s); setAbsentText(''); }}
+                className={cn(
+                  "px-4 py-2 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
                   section === s
                     ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
                     : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
@@ -138,13 +159,16 @@ const MarkAttendanceTab = () => {
           <label className="text-[0.65rem] text-muted-foreground font-cinzel tracking-[0.2em] mb-2 block uppercase">
             Absent Roll Suffixes
           </label>
-          <p className="text-[0.6rem] text-muted-foreground/60 mb-2">Comma or space separated</p>
+          <p className="text-[0.6rem] text-muted-foreground/60 mb-2">
+            {section ? `${allSuffixes.length} students in ${section} · Comma or space separated` : 'Select a course first'}
+          </p>
           <textarea
             value={absentText}
             onChange={e => setAbsentText(e.target.value)}
-            placeholder="e.g. 002, 015, 033"
+            placeholder={section ? "e.g. 002, 015, 033" : "Select a course/section first..."}
+            disabled={!section}
             rows={3}
-            className="w-full bg-card/70 border border-primary/10 rounded-[10px] px-4 py-3 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_15px_hsla(42,88%,55%,0.08)] transition-all duration-200 font-mono-num resize-none"
+            className="w-full bg-card/70 border border-primary/10 rounded-[10px] px-4 py-3 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_15px_hsla(42,88%,55%,0.08)] transition-all duration-200 font-mono-num resize-none disabled:opacity-40"
           />
         </div>
 
