@@ -105,6 +105,7 @@ export type Database = {
           id: string
           name: string
           reg_number: string
+          section: string
           suffix: string
           user_id: string | null
         }
@@ -112,6 +113,7 @@ export type Database = {
           id?: string
           name: string
           reg_number: string
+          section?: string
           suffix: string
           user_id?: string | null
         }
@@ -119,6 +121,7 @@ export type Database = {
           id?: string
           name?: string
           reg_number?: string
+          section?: string
           suffix?: string
           user_id?: string | null
         }

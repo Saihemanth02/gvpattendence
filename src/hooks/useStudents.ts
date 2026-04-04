@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export interface Student {
   id: string;
@@ -7,19 +8,66 @@ export interface Student {
   reg_number: string;
   name: string;
   user_id: string | null;
+  section: string;
 }
 
-export const useStudents = () => {
+export const useStudents = (section?: string) => {
   return useQuery({
-    queryKey: ['students'],
+    queryKey: ['students', section],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('students')
-        .select('*')
-        .order('suffix', { ascending: true });
+      let query = supabase.from('students').select('*').order('suffix', { ascending: true });
+      if (section) query = query.eq('section', section);
+      const { data, error } = await query;
       if (error) throw error;
       return data as Student[];
     },
+  });
+};
+
+export const useSections = () => {
+  return useQuery({
+    queryKey: ['sections'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('students')
+        .select('section')
+        .order('section');
+      if (error) throw error;
+      const unique = [...new Set((data || []).map(d => d.section))];
+      return unique;
+    },
+  });
+};
+
+export const useAddStudent = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (student: { suffix: string; reg_number: string; name: string; section: string }) => {
+      const { error } = await supabase.from('students').insert(student);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['students'] });
+      qc.invalidateQueries({ queryKey: ['sections'] });
+      toast.success('Student added');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
+export const useRemoveStudent = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('students').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['students'] });
+      qc.invalidateQueries({ queryKey: ['sections'] });
+      toast.success('Student removed');
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 };
 
