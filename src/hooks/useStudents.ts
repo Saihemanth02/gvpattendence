@@ -24,6 +24,13 @@ export const useStudents = (section?: string) => {
   });
 };
 
+export const COURSE_SECTIONS = {
+  PG: ['MCA', 'MBA', 'MSc'],
+  UG: ['BSc (Computers)', 'BCA (Data Science)', 'BCA (Artificial Intelligence)', 'BSc (Electronics)'],
+} as const;
+
+export const ALL_SECTIONS = [...COURSE_SECTIONS.PG, ...COURSE_SECTIONS.UG];
+
 export const useSections = () => {
   return useQuery({
     queryKey: ['sections'],
