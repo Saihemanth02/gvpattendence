@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useStudents, COURSE_SECTIONS } from '@/hooks/useStudents';
 import { useSubmitAttendance } from '@/hooks/useAttendance';
 import { format } from 'date-fns';
