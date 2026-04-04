@@ -8,6 +8,7 @@ import SparkleCanvas from '@/components/SparkleCanvas';
 import AppHeader from '@/components/AppHeader';
 import NavigationTabs, { type TabId } from '@/components/NavigationTabs';
 import MobileBottomNav from '@/components/MobileBottomNav';
+import SectionFilter from '@/components/SectionFilter';
 import DashboardTab from '@/pages/DashboardTab';
 import MarkAttendanceTab from '@/pages/MarkAttendanceTab';
 import StudentsTab from '@/pages/StudentsTab';
@@ -17,22 +18,13 @@ import EligibilityTab from '@/pages/EligibilityTab';
 import MarksTab from '@/pages/MarksTab';
 import StudentDashboard from '@/pages/StudentDashboard';
 
-const tabComponent: Record<TabId, React.FC> = {
-  dashboard: DashboardTab,
-  mark: MarkAttendanceTab,
-  students: StudentsTab,
-  history: HistoryTab,
-  weekly: WeeklyViewTab,
-  eligibility: EligibilityTab,
-  marks: MarksTab,
-};
-
 const Index = () => {
   const { user, loading } = useAuth();
   const [splashDone, setSplashDone] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const [displayedTab, setDisplayedTab] = useState<TabId>('dashboard');
   const [transitioning, setTransitioning] = useState(false);
+  const [selectedSection, setSelectedSection] = useState<string>('all');
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const handleSplashComplete = useCallback(() => setSplashDone(true), []);
@@ -44,12 +36,11 @@ const Index = () => {
     timeoutRef.current = setTimeout(() => {
       setActiveTab(tab);
       setDisplayedTab(tab);
-      // Small delay to let React render new content before fading in
       requestAnimationFrame(() => setTransitioning(false));
-    }, 200); // matches fade-out duration
+    }, 200);
   }, [activeTab]);
 
-  // Keyboard shortcuts: 1-6 to switch tabs
+  // Keyboard shortcuts: 1-7 to switch tabs
   useEffect(() => {
     const tabOrder: TabId[] = ['dashboard', 'mark', 'students', 'history', 'weekly', 'eligibility', 'marks'];
     const tabLabels: Record<TabId, string> = {
@@ -99,12 +90,25 @@ const Index = () => {
     return <LoginPage />;
   }
 
-  // Students get their own self-service dashboard
   if (user.role === 'student') {
     return <StudentDashboard />;
   }
 
-  const ActiveComponent = tabComponent[displayedTab];
+  // Convert global section to the format each tab expects
+  const sectionForTabs = selectedSection === 'all' ? '' : selectedSection;
+
+  const renderTab = () => {
+    switch (displayedTab) {
+      case 'dashboard': return <DashboardTab selectedSection={selectedSection} />;
+      case 'mark': return <MarkAttendanceTab selectedSection={sectionForTabs} />;
+      case 'students': return <StudentsTab selectedSection={sectionForTabs} />;
+      case 'history': return <HistoryTab selectedSection={sectionForTabs} />;
+      case 'weekly': return <WeeklyViewTab selectedSection={sectionForTabs} />;
+      case 'eligibility': return <EligibilityTab selectedSection={sectionForTabs} />;
+      case 'marks': return <MarksTab selectedSection={sectionForTabs} />;
+      default: return <DashboardTab selectedSection={selectedSection} />;
+    }
+  };
 
   return (
     <div className="min-h-screen gold-grid-bg relative">
@@ -113,6 +117,7 @@ const Index = () => {
       <div className="relative z-10">
         <AppHeader />
         <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} />
+        <SectionFilter selectedSection={selectedSection} onSectionChange={setSelectedSection} />
         <main
           className="pb-24 md:pb-8"
           style={{
@@ -121,7 +126,7 @@ const Index = () => {
             transition: 'opacity 0.25s ease, transform 0.25s ease',
           }}
         >
-          <ActiveComponent />
+          {renderTab()}
         </main>
       </div>
       <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} />
