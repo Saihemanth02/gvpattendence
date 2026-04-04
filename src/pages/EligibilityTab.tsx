@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useStudents } from '@/hooks/useStudents';
+import { useStudents, COURSE_SECTIONS } from '@/hooks/useStudents';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, Filter, Download, Search, Shield, Users, UserCheck, UserX } from 'lucide-react';
@@ -12,12 +12,20 @@ const SUBJECT_THRESHOLD = 65;
 const OVERALL_THRESHOLD = 75;
 
 const EligibilityTab = () => {
-  const { data: students } = useStudents();
+  const [sectionFilter, setSectionFilter] = useState<string>('');
+  const { data: students } = useStudents(sectionFilter || undefined);
   const { data: records } = useAttendanceRecords();
   const recordIds = useMemo(() => records?.map(r => r.id), [records]);
   const { data: entries } = useAttendanceEntries(recordIds);
   const [filterStatus, setFilterStatus] = useState<'all' | 'eligible' | 'not-eligible'>('all');
   const [search, setSearch] = useState('');
+
+  // Filter records by section too
+  const filteredRecords = useMemo(() => {
+    if (!records) return [];
+    if (!sectionFilter) return records;
+    return records.filter(r => r.section === sectionFilter);
+  }, [records, sectionFilter]);
 
   const eligibilityData = useMemo(() => {
     if (!students?.length || !records?.length || !entries?.length) return [];
