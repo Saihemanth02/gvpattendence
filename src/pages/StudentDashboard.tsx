@@ -19,6 +19,7 @@ const StudentDashboard = () => {
   const { data: records, isLoading: recordsLoading } = useAttendanceRecords();
   const recordIds = records?.map(r => r.id) || [];
   const { data: entries, isLoading: entriesLoading } = useAttendanceEntries(recordIds);
+  const { data: myMarks, isLoading: marksLoading } = useStudentMarks(user?.suffix);
   const [monthFilter, setMonthFilter] = useState<MonthFilter>('all');
 
   const isLoading = recordsLoading || entriesLoading;
