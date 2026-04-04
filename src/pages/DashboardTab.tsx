@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { useStudents } from '@/hooks/useStudents';
-import { Users, BookOpen, TrendingUp, AlertTriangle } from 'lucide-react';
+import { useMarks } from '@/hooks/useMarks';
+import { Users, BookOpen, TrendingUp, AlertTriangle, FileText } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
