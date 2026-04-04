@@ -1,14 +1,16 @@
 import { useAttendanceRecords } from '@/hooks/useAttendance';
+import { COURSE_SECTIONS } from '@/hooks/useStudents';
 import { startOfWeek, endOfWeek, eachDayOfInterval, format, isToday, isSameDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { CalendarDays, Clock } from 'lucide-react';
 
 const PERIODS = [1, 2, 3, 4, 5, 6, 7];
 
 const WeeklyViewTab = () => {
   const { data: records, isLoading } = useAttendanceRecords();
+  const [sectionFilter, setSectionFilter] = useState<string>('');
 
   const weekDays = useMemo(() => {
     const start = startOfWeek(new Date(), { weekStartsOn: 1 });
