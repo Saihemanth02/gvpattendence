@@ -195,13 +195,18 @@ const StudentsTab = () => {
                 placeholder="Full Name"
                 className="bg-background/50 border border-primary/10 rounded-[8px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-all"
               />
-              <input
-                type="text"
+              <select
                 value={newStudent.section}
                 onChange={e => setNewStudent(s => ({ ...s, section: e.target.value }))}
-                placeholder="Section (e.g. MCA)"
-                className="bg-background/50 border border-primary/10 rounded-[8px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-all"
-              />
+                className="bg-background/50 border border-primary/10 rounded-[8px] px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/40 transition-all"
+              >
+                <optgroup label="Postgraduate (PG)">
+                  {COURSE_SECTIONS.PG.map(sec => <option key={sec} value={sec}>{sec}</option>)}
+                </optgroup>
+                <optgroup label="Undergraduate (UG)">
+                  {COURSE_SECTIONS.UG.map(sec => <option key={sec} value={sec}>{sec}</option>)}
+                </optgroup>
+              </select>
             </div>
             <button
               onClick={handleAdd}
