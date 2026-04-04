@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useStudents, COURSE_SECTIONS } from '@/hooks/useStudents';
 import { useMarks, useUpsertMark, useBulkUpsertMarks, useDeleteMark, useMarkSubjects, useAttendanceSubjects } from '@/hooks/useMarks';
 import { cn } from '@/lib/utils';
@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Upload, Trash2, Save, FileSpreadsheet, Plus } from 'lucide-react';
 
-const MarksTab = () => {
-  const [section, setSection] = useState('');
+const MarksTab = ({ selectedSection }: { selectedSection: string }) => {
+  const [section, setSection] = useState(selectedSection);
   const [subject, setSubject] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -18,6 +18,8 @@ const MarksTab = () => {
   const [newMid1, setNewMid1] = useState('');
   const [newMid2, setNewMid2] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { setSection(selectedSection); }, [selectedSection]);
 
   const { data: students } = useStudents(section || undefined);
   const { data: marks, isLoading } = useMarks(section || undefined, subject || undefined);

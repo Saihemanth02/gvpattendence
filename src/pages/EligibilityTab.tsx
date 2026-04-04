@@ -11,8 +11,7 @@ import { cn } from '@/lib/utils';
 const SUBJECT_THRESHOLD = 65;
 const OVERALL_THRESHOLD = 75;
 
-const EligibilityTab = () => {
-  const [sectionFilter, setSectionFilter] = useState<string>('');
+const EligibilityTab = ({ selectedSection: sectionFilter }: { selectedSection: string }) => {
   const { data: students } = useStudents(sectionFilter || undefined);
   const { data: records } = useAttendanceRecords();
   const recordIds = useMemo(() => records?.map(r => r.id), [records]);
@@ -165,74 +164,7 @@ const EligibilityTab = () => {
         </div>
       </div>
 
-      {/* Section Filter */}
-      <div className="flex gap-2 flex-wrap items-center">
-        <button
-          onClick={() => setSectionFilter('')}
-          className={cn(
-            "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
-            !sectionFilter
-              ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
-              : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
-          )}
-        >
-          ALL
-        </button>
-        <span className="text-[0.5rem] text-muted-foreground/50 font-cinzel tracking-wider">PG:</span>
-        {COURSE_SECTIONS.PG.map(sec => (
-          <button
-            key={sec}
-            onClick={() => setSectionFilter(sec)}
-            className={cn(
-              "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
-              sectionFilter === sec
-                ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
-                : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
-            )}
-          >
-            {sec}
-          </button>
-        ))}
-        <span className="text-[0.5rem] text-muted-foreground/50 font-cinzel tracking-wider">UG:</span>
-        {COURSE_SECTIONS.UG.map(sec => (
-          <button
-            key={sec}
-            onClick={() => setSectionFilter(sec)}
-            className={cn(
-              "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
-              sectionFilter === sec
-                ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
-                : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
-            )}
-          >
-            {sec}
-          </button>
-        ))}
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {statCards.map(card => (
-          <div
-            key={card.label}
-            className="glass-card p-4 rounded-xl flex items-center gap-3 hover:scale-[1.02] transition-transform duration-200"
-          >
-            <div className={cn(
-              "w-11 h-11 rounded-xl flex items-center justify-center border",
-              card.bgClass,
-              card.borderClass
-            )}>
-              <card.icon className={cn("w-5 h-5", card.colorClass)} />
-            </div>
-            <div>
-              <p className="text-[0.6rem] font-cinzel tracking-[0.2em] text-muted-foreground uppercase">
-                {card.label}
-              </p>
-              <p className={cn("text-2xl font-cinzel font-bold", card.colorClass)}>
-                {card.value}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
+
 
       {/* Criteria Info */}
       <div className="glass-card p-4 rounded-xl border-primary/20">

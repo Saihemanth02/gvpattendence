@@ -8,9 +8,8 @@ import { CalendarDays, Clock } from 'lucide-react';
 
 const PERIODS = [1, 2, 3, 4, 5, 6, 7];
 
-const WeeklyViewTab = () => {
+const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: string }) => {
   const { data: records, isLoading } = useAttendanceRecords();
-  const [sectionFilter, setSectionFilter] = useState<string>('');
 
   const weekDays = useMemo(() => {
     const start = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -71,50 +70,7 @@ const WeeklyViewTab = () => {
         </div>
       </div>
 
-      {/* Section Filter */}
-      <div className="flex gap-2 flex-wrap items-center">
-        <button
-          onClick={() => setSectionFilter('')}
-          className={cn(
-            "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
-            !sectionFilter
-              ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
-              : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
-          )}
-        >
-          ALL
-        </button>
-        <span className="text-[0.5rem] text-muted-foreground/50 font-cinzel tracking-wider">PG:</span>
-        {COURSE_SECTIONS.PG.map(sec => (
-          <button
-            key={sec}
-            onClick={() => setSectionFilter(sec)}
-            className={cn(
-              "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
-              sectionFilter === sec
-                ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
-                : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
-            )}
-          >
-            {sec}
-          </button>
-        ))}
-        <span className="text-[0.5rem] text-muted-foreground/50 font-cinzel tracking-wider">UG:</span>
-        {COURSE_SECTIONS.UG.map(sec => (
-          <button
-            key={sec}
-            onClick={() => setSectionFilter(sec)}
-            className={cn(
-              "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
-              sectionFilter === sec
-                ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
-                : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
-            )}
-          >
-            {sec}
-          </button>
-        ))}
-      </div>
+
 
       {/* Legend */}
       <div className="flex items-center gap-4 text-xs text-muted-foreground font-raleway">

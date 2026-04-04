@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
-import { useStudents, useSections } from '@/hooks/useStudents';
+import { useStudents } from '@/hooks/useStudents';
 import { useMarks } from '@/hooks/useMarks';
-import { Users, BookOpen, TrendingUp, AlertTriangle, FileText, Filter } from 'lucide-react';
+import { Users, BookOpen, TrendingUp, AlertTriangle, FileText } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -29,9 +29,7 @@ const StatCard = ({ icon, label, value, iconBg, iconBorder }: StatCardProps) => 
   </div>
 );
 
-const DashboardTab = () => {
-  const [selectedSection, setSelectedSection] = useState<string>('all');
-  const { data: sections } = useSections();
+const DashboardTab = ({ selectedSection }: { selectedSection: string }) => {
   const { data: allStudents, isLoading: studentsLoading } = useStudents();
   const { data: records, isLoading: recordsLoading } = useAttendanceRecords();
   const recordIds = records?.map(r => r.id) || [];
@@ -113,40 +111,6 @@ const DashboardTab = () => {
 
   return (
     <div className="space-y-6 p-4 md:p-6 max-w-[1200px] mx-auto animate-fade-in-up">
-      {/* Section Filter */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Filter className="w-4 h-4" />
-          <span className="text-[0.7rem] font-cinzel tracking-[0.15em] uppercase">Section</span>
-        </div>
-        <div className="flex gap-1.5 flex-wrap">
-          <button
-            onClick={() => setSelectedSection('all')}
-            className={cn(
-              'px-3 py-1.5 rounded-lg text-[0.75rem] font-cinzel transition-all border',
-              selectedSection === 'all'
-                ? 'bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 font-semibold shadow-[0_0_15px_hsla(42,88%,55%,0.08)]'
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/40 border-transparent'
-            )}
-          >
-            All
-          </button>
-          {(sections || []).map(sec => (
-            <button
-              key={sec}
-              onClick={() => setSelectedSection(sec)}
-              className={cn(
-                'px-3 py-1.5 rounded-lg text-[0.75rem] font-cinzel transition-all border',
-                selectedSection === sec
-                  ? 'bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 font-semibold shadow-[0_0_15px_hsla(42,88%,55%,0.08)]'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/40 border-transparent'
-              )}
-            >
-              {sec}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Stat Cards — 2×2 grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
