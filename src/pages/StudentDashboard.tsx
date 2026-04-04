@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
+import { useStudentMarks } from '@/hooks/useMarks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { format, startOfMonth, endOfMonth, subMonths, isWithinInterval, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { TrendingUp, BookOpen, CheckCircle, XCircle, User, Calendar, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { TrendingUp, BookOpen, CheckCircle, XCircle, User, Calendar, ChevronLeft, ChevronRight, Download, FileText } from 'lucide-react';
 import FloatingOrbs from '@/components/FloatingOrbs';
 import SparkleCanvas from '@/components/SparkleCanvas';
 import AppHeader from '@/components/AppHeader';
