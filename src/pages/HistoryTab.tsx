@@ -40,11 +40,15 @@ const HistoryTab = () => {
 
   const filteredRecords = useMemo(() => {
     if (!records) return [];
-    if (monthFilter === 'all') return records;
+    let filtered = records;
+    if (sectionFilter) {
+      filtered = filtered.filter(r => r.section === sectionFilter);
+    }
+    if (monthFilter === 'all') return filtered;
     const start = monthFilter === 'current' ? currentMonthStart : prevMonthStart;
     const end = monthFilter === 'current' ? currentMonthEnd : prevMonthEnd;
-    return records.filter(r => isWithinInterval(parseISO(r.date), { start, end }));
-  }, [records, monthFilter]);
+    return filtered.filter(r => isWithinInterval(parseISO(r.date), { start, end }));
+  }, [records, monthFilter, sectionFilter]);
 
   const exportCSV = () => {
     if (!filteredRecords.length) {
