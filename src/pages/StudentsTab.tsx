@@ -77,7 +77,7 @@ const StudentsTab = () => {
     );
   }
 
-  const allSections = sections || ['MCA'];
+  
 
   return (
     <div className="p-4 md:p-6 animate-fade-in-up max-w-[1200px] mx-auto">
