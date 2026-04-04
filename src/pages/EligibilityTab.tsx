@@ -28,14 +28,14 @@ const EligibilityTab = () => {
   }, [records, sectionFilter]);
 
   const eligibilityData = useMemo(() => {
-    if (!students?.length || !records?.length || !entries?.length) return [];
+    if (!students?.length || !filteredRecords?.length || !entries?.length) return [];
 
     return students.map(student => {
       const subjectMap: Record<string, { total: number; present: number }> = {};
       let totalClasses = 0;
       let totalPresent = 0;
 
-      records.forEach(record => {
+      filteredRecords.forEach(record => {
         const entry = entries.find(
           e => e.record_id === record.id && e.student_suffix === student.suffix
         );
