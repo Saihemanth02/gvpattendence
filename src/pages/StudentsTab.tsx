@@ -19,10 +19,15 @@ const StudentsTab = () => {
   const [sortField, setSortField] = useState<'name' | 'pct'>('name');
   const [sortAsc, setSortAsc] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showCsvImport, setShowCsvImport] = useState(false);
+  const [csvPreview, setCsvPreview] = useState<{ suffix: string; reg_number: string; name: string; section: string }[]>([]);
+  const [csvErrors, setCsvErrors] = useState<string[]>([]);
   const [newStudent, setNewStudent] = useState({ suffix: '', reg_number: '', name: '', section: 'MCA' });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addMutation = useAddStudent();
   const removeMutation = useRemoveStudent();
+  const bulkAddMutation = useBulkAddStudents();
 
   const isFaculty = user?.role === 'faculty';
 
