@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useStudents } from '@/hooks/useStudents';
+import { useStudents, COURSE_SECTIONS } from '@/hooks/useStudents';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, Filter, Download, Search, Shield, Users, UserCheck, UserX } from 'lucide-react';
@@ -12,22 +12,30 @@ const SUBJECT_THRESHOLD = 65;
 const OVERALL_THRESHOLD = 75;
 
 const EligibilityTab = () => {
-  const { data: students } = useStudents();
+  const [sectionFilter, setSectionFilter] = useState<string>('');
+  const { data: students } = useStudents(sectionFilter || undefined);
   const { data: records } = useAttendanceRecords();
   const recordIds = useMemo(() => records?.map(r => r.id), [records]);
   const { data: entries } = useAttendanceEntries(recordIds);
   const [filterStatus, setFilterStatus] = useState<'all' | 'eligible' | 'not-eligible'>('all');
   const [search, setSearch] = useState('');
 
+  // Filter records by section too
+  const filteredRecords = useMemo(() => {
+    if (!records) return [];
+    if (!sectionFilter) return records;
+    return records.filter(r => r.section === sectionFilter);
+  }, [records, sectionFilter]);
+
   const eligibilityData = useMemo(() => {
-    if (!students?.length || !records?.length || !entries?.length) return [];
+    if (!students?.length || !filteredRecords?.length || !entries?.length) return [];
 
     return students.map(student => {
       const subjectMap: Record<string, { total: number; present: number }> = {};
       let totalClasses = 0;
       let totalPresent = 0;
 
-      records.forEach(record => {
+      filteredRecords.forEach(record => {
         const entry = entries.find(
           e => e.record_id === record.id && e.student_suffix === student.suffix
         );
@@ -70,7 +78,7 @@ const EligibilityTab = () => {
         totalPresent,
       };
     });
-  }, [students, records, entries]);
+  }, [students, filteredRecords, entries]);
 
   const withData = useMemo(() => eligibilityData.filter(s => s.totalClasses > 0), [eligibilityData]);
 
@@ -157,7 +165,50 @@ const EligibilityTab = () => {
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {/* Section Filter */}
+      <div className="flex gap-2 flex-wrap items-center">
+        <button
+          onClick={() => setSectionFilter('')}
+          className={cn(
+            "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
+            !sectionFilter
+              ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
+              : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+          )}
+        >
+          ALL
+        </button>
+        <span className="text-[0.5rem] text-muted-foreground/50 font-cinzel tracking-wider">PG:</span>
+        {COURSE_SECTIONS.PG.map(sec => (
+          <button
+            key={sec}
+            onClick={() => setSectionFilter(sec)}
+            className={cn(
+              "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
+              sectionFilter === sec
+                ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
+                : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+            )}
+          >
+            {sec}
+          </button>
+        ))}
+        <span className="text-[0.5rem] text-muted-foreground/50 font-cinzel tracking-wider">UG:</span>
+        {COURSE_SECTIONS.UG.map(sec => (
+          <button
+            key={sec}
+            onClick={() => setSectionFilter(sec)}
+            className={cn(
+              "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
+              sectionFilter === sec
+                ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
+                : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+            )}
+          >
+            {sec}
+          </button>
+        ))}
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {statCards.map(card => (
           <div

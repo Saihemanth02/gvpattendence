@@ -36,7 +36,7 @@ const WeeklyViewTab = () => {
       });
     });
     return count;
-  }, [records, weekDays]);
+  }, [filteredRecords, weekDays]);
 
   if (isLoading) {
     return (
