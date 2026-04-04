@@ -206,65 +206,7 @@ const StudentsTab = ({ selectedSection: globalSection }: { selectedSection: stri
           )}
         </div>
 
-        {/* Section Filter */}
-        <div className="mb-4 space-y-3">
-          {/* Category tabs */}
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={() => setSelectedSection('')}
-              className={cn(
-                "px-4 py-1.5 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
-                !selectedSection
-                  ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
-                  : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
-              )}
-            >
-              ALL
-            </button>
-          </div>
 
-          {/* PG Section */}
-          <div>
-            <p className="text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase mb-1.5">Postgraduate (PG)</p>
-            <div className="flex gap-2 flex-wrap">
-              {COURSE_SECTIONS.PG.map(sec => (
-                <button
-                  key={sec}
-                  onClick={() => setSelectedSection(sec)}
-                  className={cn(
-                    "px-4 py-1.5 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
-                    selectedSection === sec
-                      ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
-                      : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
-                  )}
-                >
-                  {sec}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* UG Section */}
-          <div>
-            <p className="text-[0.6rem] font-cinzel text-muted-foreground tracking-[0.2em] uppercase mb-1.5">Undergraduate (UG)</p>
-            <div className="flex gap-2 flex-wrap">
-              {COURSE_SECTIONS.UG.map(sec => (
-                <button
-                  key={sec}
-                  onClick={() => setSelectedSection(sec)}
-                  className={cn(
-                    "px-4 py-1.5 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
-                    selectedSection === sec
-                      ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40 shadow-[0_0_15px_hsla(42,88%,55%,0.1)]"
-                      : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
-                  )}
-                >
-                  {sec}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
 
         {/* Add Student Form */}
         {showAddForm && isFaculty && (
