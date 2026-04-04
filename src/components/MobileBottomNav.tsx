@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, ClipboardCheck, Users, History, CalendarDays, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, ClipboardCheck, Users, History, CalendarDays, ShieldCheck, FileText } from 'lucide-react';
 import type { TabId } from '@/components/NavigationTabs';
 
 interface MobileBottomNavProps {
