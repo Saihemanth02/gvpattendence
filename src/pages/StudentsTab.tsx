@@ -75,6 +75,83 @@ const StudentsTab = () => {
     });
   };
 
+  const parseCsv = (text: string) => {
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) {
+      setCsvErrors(['CSV must have a header row and at least one data row']);
+      return;
+    }
+    const header = lines[0].toLowerCase().split(',').map(h => h.trim());
+    const suffixIdx = header.findIndex(h => h === 'suffix');
+    const regIdx = header.findIndex(h => h === 'reg_number' || h === 'registration number' || h === 'reg number' || h === 'regnumber');
+    const nameIdx = header.findIndex(h => h === 'name' || h === 'student name' || h === 'full name');
+    const sectionIdx = header.findIndex(h => h === 'section' || h === 'course');
+
+    const missing: string[] = [];
+    if (suffixIdx === -1) missing.push('suffix');
+    if (regIdx === -1) missing.push('reg_number');
+    if (nameIdx === -1) missing.push('name');
+    if (missing.length > 0) {
+      setCsvErrors([`Missing required columns: ${missing.join(', ')}. Required: suffix, reg_number, name. Optional: section`]);
+      return;
+    }
+
+    const errors: string[] = [];
+    const parsed: { suffix: string; reg_number: string; name: string; section: string }[] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',').map(c => c.trim());
+      const suffix = cols[suffixIdx] || '';
+      const reg_number = cols[regIdx] || '';
+      const name = cols[nameIdx] || '';
+      const section = sectionIdx !== -1 ? (cols[sectionIdx] || 'MCA') : 'MCA';
+
+      if (!suffix || !reg_number || !name) {
+        errors.push(`Row ${i + 1}: missing required fields`);
+        continue;
+      }
+      if (suffix.length > 10 || reg_number.length > 50 || name.length > 255) {
+        errors.push(`Row ${i + 1}: field too long`);
+        continue;
+      }
+      parsed.push({ suffix, reg_number, name, section });
+    }
+
+    setCsvErrors(errors);
+    setCsvPreview(parsed);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith('.csv')) {
+      toast.error('Please upload a .csv file');
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      toast.error('File too large (max 1MB)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      parseCsv(text);
+    };
+    reader.readAsText(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleBulkImport = () => {
+    if (csvPreview.length === 0) return;
+    bulkAddMutation.mutate(csvPreview, {
+      onSuccess: () => {
+        setCsvPreview([]);
+        setCsvErrors([]);
+        setShowCsvImport(false);
+      }
+    });
+  };
+
   if (studentsLoading) {
     return (
       <div className="p-4 md:p-6 space-y-3 max-w-[1200px] mx-auto">
