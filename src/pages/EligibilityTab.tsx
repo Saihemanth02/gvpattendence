@@ -78,7 +78,7 @@ const EligibilityTab = () => {
         totalPresent,
       };
     });
-  }, [students, records, entries]);
+  }, [students, filteredRecords, entries]);
 
   const withData = useMemo(() => eligibilityData.filter(s => s.totalClasses > 0), [eligibilityData]);
 
