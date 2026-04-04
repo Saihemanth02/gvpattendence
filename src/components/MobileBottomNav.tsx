@@ -15,6 +15,7 @@ const tabs: { id: TabId; label: string; icon: React.ElementType; facultyOnly?: b
   { id: 'history', label: 'History', icon: History },
   { id: 'weekly', label: 'Weekly', icon: CalendarDays },
   { id: 'eligibility', label: 'Eligible', icon: ShieldCheck },
+  { id: 'marks', label: 'Marks', icon: FileText },
 ];
 
 const MobileBottomNav = ({ activeTab, onTabChange }: MobileBottomNavProps) => {

@@ -51,7 +51,7 @@ const Index = () => {
 
   // Keyboard shortcuts: 1-6 to switch tabs
   useEffect(() => {
-    const tabOrder: TabId[] = ['dashboard', 'mark', 'students', 'history', 'weekly', 'eligibility'];
+    const tabOrder: TabId[] = ['dashboard', 'mark', 'students', 'history', 'weekly', 'eligibility', 'marks'];
     const tabLabels: Record<TabId, string> = {
       dashboard: 'Dashboard',
       mark: 'Mark Attendance',
@@ -59,6 +59,7 @@ const Index = () => {
       history: 'History',
       weekly: 'Weekly View',
       eligibility: 'Eligibility',
+      marks: 'Marks',
     };
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
