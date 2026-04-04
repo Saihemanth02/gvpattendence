@@ -104,7 +104,7 @@ const AppHeader = () => {
           )}
           title="Session time remaining"
         >
-          <svg width="28" height="28" className="flex-shrink-0 -rotate-90">
+          <svg width="28" height="28" className="flex-shrink-0 -rotate-90 hidden md:block">
             <circle cx="14" cy="14" r="13" fill="none" strokeWidth="2" className={cn(isUrgent ? "stroke-destructive/20" : "stroke-primary/15")} />
             <circle cx="14" cy="14" r="13" fill="none" strokeWidth="2.5" strokeLinecap="round"
               className={cn("transition-all duration-1000", isUrgent ? "stroke-destructive" : "stroke-primary/70")}
