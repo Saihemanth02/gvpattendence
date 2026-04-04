@@ -1,8 +1,8 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, ClipboardCheck, Users, History, CalendarDays, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, ClipboardCheck, Users, History, CalendarDays, ShieldCheck, FileText } from 'lucide-react';
 
-export type TabId = 'dashboard' | 'mark' | 'students' | 'history' | 'weekly' | 'eligibility';
+export type TabId = 'dashboard' | 'mark' | 'students' | 'history' | 'weekly' | 'eligibility' | 'marks';
 
 interface NavigationTabsProps {
   activeTab: TabId;
