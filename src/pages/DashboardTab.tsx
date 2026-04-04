@@ -55,6 +55,27 @@ const DashboardTab = () => {
     below75 = studentStats.filter(p => p < 75).length;
   }
 
+  const subjectMarksSummary = useMemo(() => {
+    if (!allMarks || allMarks.length === 0) return [];
+    const map = new Map<string, { sum: number; count: number; section: string }>();
+    allMarks.forEach(m => {
+      if (m.internal === null) return;
+      const key = `${m.subject}||${m.section}`;
+      const existing = map.get(key) || { sum: 0, count: 0, section: m.section };
+      existing.sum += Number(m.internal);
+      existing.count++;
+      map.set(key, existing);
+    });
+    return Array.from(map.entries())
+      .map(([key, stats]) => ({
+        subject: key.split('||')[0],
+        section: stats.section,
+        avg: Math.round((stats.sum / stats.count) * 10) / 10,
+        count: stats.count,
+      }))
+      .sort((a, b) => b.avg - a.avg);
+  }, [allMarks]);
+
   const recentRecords = records?.slice(0, 5) || [];
 
   if (isLoading) {
