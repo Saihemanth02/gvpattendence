@@ -14,6 +14,35 @@ export interface Mark {
   updated_at: string;
 }
 
+export const useMarkSubjects = (section?: string) => {
+  return useQuery({
+    queryKey: ['mark-subjects', section],
+    queryFn: async () => {
+      let query = supabase.from('marks').select('subject, section');
+      if (section) query = query.eq('section', section);
+      const { data, error } = await query;
+      if (error) throw error;
+      const unique = [...new Set((data || []).map(d => d.subject))].sort();
+      return unique;
+    },
+  });
+};
+
+// Also pull subjects from attendance_records for broader suggestions
+export const useAttendanceSubjects = (section?: string) => {
+  return useQuery({
+    queryKey: ['attendance-subjects', section],
+    queryFn: async () => {
+      let query = supabase.from('attendance_records').select('subject, section');
+      if (section) query = query.eq('section', section);
+      const { data, error } = await query;
+      if (error) throw error;
+      const unique = [...new Set((data || []).map(d => d.subject))].sort();
+      return unique;
+    },
+  });
+};
+
 export const useMarks = (section?: string, subject?: string) => {
   return useQuery({
     queryKey: ['marks', section, subject],

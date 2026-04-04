@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import { useStudents, COURSE_SECTIONS } from '@/hooks/useStudents';
-import { useMarks, useUpsertMark, useBulkUpsertMarks, useDeleteMark } from '@/hooks/useMarks';
+import { useMarks, useUpsertMark, useBulkUpsertMarks, useDeleteMark, useMarkSubjects, useAttendanceSubjects } from '@/hooks/useMarks';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
