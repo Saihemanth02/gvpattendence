@@ -177,18 +177,32 @@ const StudentsTab = () => {
             </div>
           </div>
           {isFaculty && (
-            <button
-              onClick={() => { setShowAddForm(!showAddForm); setNewStudent(s => ({ ...s, section: selectedSection || 'MCA' })); }}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
-                showAddForm
-                  ? "bg-destructive/10 border-destructive/30 text-destructive"
-                  : "bg-primary/10 border-primary/30 text-primary hover:bg-primary/20"
-              )}
-            >
-              {showAddForm ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-              {showAddForm ? 'Cancel' : 'Add Student'}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setShowCsvImport(!showCsvImport); if (showAddForm) setShowAddForm(false); setCsvPreview([]); setCsvErrors([]); }}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-2 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
+                  showCsvImport
+                    ? "bg-destructive/10 border-destructive/30 text-destructive"
+                    : "bg-accent/10 border-accent/30 text-accent-foreground hover:bg-accent/20"
+                )}
+              >
+                {showCsvImport ? <X className="w-3.5 h-3.5" /> : <Upload className="w-3.5 h-3.5" />}
+                {showCsvImport ? 'Cancel' : 'Import CSV'}
+              </button>
+              <button
+                onClick={() => { setShowAddForm(!showAddForm); if (showCsvImport) setShowCsvImport(false); setNewStudent(s => ({ ...s, section: selectedSection || 'MCA' })); }}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-2 rounded-[10px] text-xs font-cinzel border transition-all duration-200",
+                  showAddForm
+                    ? "bg-destructive/10 border-destructive/30 text-destructive"
+                    : "bg-primary/10 border-primary/30 text-primary hover:bg-primary/20"
+                )}
+              >
+                {showAddForm ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                {showAddForm ? 'Cancel' : 'Add'}
+              </button>
+            </div>
           )}
         </div>
 
