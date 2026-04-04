@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
-import { useStudents, useSections, useAddStudent, useRemoveStudent, COURSE_SECTIONS, ALL_SECTIONS } from '@/hooks/useStudents';
+import { useState, useMemo, useRef } from 'react';
+import { useStudents, useSections, useAddStudent, useRemoveStudent, useBulkAddStudents, COURSE_SECTIONS, ALL_SECTIONS } from '@/hooks/useStudents';
 import { useAttendanceRecords, useAttendanceEntries } from '@/hooks/useAttendance';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, Users, ChevronDown, ChevronUp, Plus, Trash2, X } from 'lucide-react';
+import { Search, Users, ChevronDown, ChevronUp, Plus, Trash2, X, Upload, FileText, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
 
 const StudentsTab = () => {
   const { user } = useAuth();
