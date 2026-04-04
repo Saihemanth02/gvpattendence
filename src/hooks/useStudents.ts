@@ -46,6 +46,23 @@ export const useSections = () => {
   });
 };
 
+export const useBulkAddStudents = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (students: { suffix: string; reg_number: string; name: string; section: string }[]) => {
+      const { error } = await supabase.from('students').insert(students);
+      if (error) throw error;
+      return students.length;
+    },
+    onSuccess: (count) => {
+      qc.invalidateQueries({ queryKey: ['students'] });
+      qc.invalidateQueries({ queryKey: ['sections'] });
+      toast.success(`${count} students imported successfully`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
 export const useAddStudent = () => {
   const qc = useQueryClient();
   return useMutation({
