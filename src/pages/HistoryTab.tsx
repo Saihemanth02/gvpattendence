@@ -1,5 +1,5 @@
 import { useAttendanceRecords, useAttendanceEntries, useDeleteAttendance } from '@/hooks/useAttendance';
-import { useStudents } from '@/hooks/useStudents';
+import { useStudents, COURSE_SECTIONS } from '@/hooks/useStudents';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, startOfMonth, endOfMonth, subMonths, isWithinInterval, parseISO } from 'date-fns';
 import { Trash2, Clock, CheckCircle, XCircle, ChevronLeft, ChevronRight, Download } from 'lucide-react';
@@ -18,6 +18,7 @@ const HistoryTab = () => {
   const { data: students } = useStudents();
   const deleteMutation = useDeleteAttendance();
   const [monthFilter, setMonthFilter] = useState<MonthFilter>('all');
+  const [sectionFilter, setSectionFilter] = useState<string>('');
 
   const now = new Date();
   const currentMonthStart = startOfMonth(now);
@@ -39,11 +40,15 @@ const HistoryTab = () => {
 
   const filteredRecords = useMemo(() => {
     if (!records) return [];
-    if (monthFilter === 'all') return records;
+    let filtered = records;
+    if (sectionFilter) {
+      filtered = filtered.filter(r => r.section === sectionFilter);
+    }
+    if (monthFilter === 'all') return filtered;
     const start = monthFilter === 'current' ? currentMonthStart : prevMonthStart;
     const end = monthFilter === 'current' ? currentMonthEnd : prevMonthEnd;
-    return records.filter(r => isWithinInterval(parseISO(r.date), { start, end }));
-  }, [records, monthFilter]);
+    return filtered.filter(r => isWithinInterval(parseISO(r.date), { start, end }));
+  }, [records, monthFilter, sectionFilter]);
 
   const exportCSV = () => {
     if (!filteredRecords.length) {
@@ -161,6 +166,53 @@ const HistoryTab = () => {
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Export</span>
           </button>
+        </div>
+      </div>
+
+      {/* Section Filter */}
+      <div className="space-y-2">
+        <div className="flex gap-2 flex-wrap items-center">
+          <button
+            onClick={() => setSectionFilter('')}
+            className={cn(
+              "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
+              !sectionFilter
+                ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
+                : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+            )}
+          >
+            ALL
+          </button>
+          <span className="text-[0.5rem] text-muted-foreground/50 font-cinzel tracking-wider">PG:</span>
+          {COURSE_SECTIONS.PG.map(sec => (
+            <button
+              key={sec}
+              onClick={() => setSectionFilter(sec)}
+              className={cn(
+                "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
+                sectionFilter === sec
+                  ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
+                  : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+              )}
+            >
+              {sec}
+            </button>
+          ))}
+          <span className="text-[0.5rem] text-muted-foreground/50 font-cinzel tracking-wider">UG:</span>
+          {COURSE_SECTIONS.UG.map(sec => (
+            <button
+              key={sec}
+              onClick={() => setSectionFilter(sec)}
+              className={cn(
+                "px-3 py-1 rounded-[8px] text-[0.65rem] font-cinzel border transition-all duration-200",
+                sectionFilter === sec
+                  ? "bg-gradient-to-br from-secondary to-primary/15 text-primary border-primary/40"
+                  : "bg-card/70 text-muted-foreground border-primary/10 hover:text-foreground hover:border-primary/25"
+              )}
+            >
+              {sec}
+            </button>
+          ))}
         </div>
       </div>
 
