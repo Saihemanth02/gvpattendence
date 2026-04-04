@@ -318,6 +318,43 @@ const StudentDashboard = () => {
             </div>
           )}
 
+          {/* Internal Marks */}
+          {myMarks && myMarks.length > 0 && (
+            <div className="glass-card p-5 md:p-6">
+              <h3 className="font-cinzel text-[0.85rem] font-semibold text-primary tracking-[0.2em] mb-4 uppercase flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Internal Marks
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-primary/20">
+                      <th className="text-left py-2 px-2 text-xs font-cinzel text-muted-foreground">Subject</th>
+                      <th className="text-center py-2 px-2 text-xs font-cinzel text-muted-foreground">Mid-1 (20)</th>
+                      <th className="text-center py-2 px-2 text-xs font-cinzel text-muted-foreground">Mid-2 (20)</th>
+                      <th className="text-center py-2 px-2 text-xs font-cinzel text-muted-foreground">Internal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {myMarks.map(m => (
+                      <tr key={m.id} className="border-b border-primary/5 hover:bg-secondary/20 transition-colors">
+                        <td className="py-2 px-2 text-sm font-semibold text-foreground">{m.subject}</td>
+                        <td className="py-2 px-2 text-center text-sm">{m.mid1 ?? '—'}</td>
+                        <td className="py-2 px-2 text-center text-sm">{m.mid2 ?? '—'}</td>
+                        <td className={cn(
+                          'py-2 px-2 text-center text-sm font-bold',
+                          m.internal !== null && m.internal >= 10 ? 'text-[hsl(150,50%,48%)]' : 'text-destructive'
+                        )}>
+                          {m.internal ?? '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {/* Attendance Log */}
           <div className="glass-card p-5 md:p-6">
             <h3 className="font-cinzel text-[0.85rem] font-semibold text-primary tracking-[0.2em] mb-4 uppercase">
