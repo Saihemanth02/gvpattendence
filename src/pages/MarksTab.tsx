@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useStudents, COURSE_SECTIONS } from '@/hooks/useStudents';
 import { useMarks, useUpsertMark, useBulkUpsertMarks, useDeleteMark, useMarkSubjects, useAttendanceSubjects } from '@/hooks/useMarks';
 import { cn } from '@/lib/utils';
