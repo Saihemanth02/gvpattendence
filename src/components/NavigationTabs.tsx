@@ -1,8 +1,8 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, ClipboardCheck, Users, History, CalendarDays, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, ClipboardCheck, Users, History, CalendarDays, ShieldCheck, FileText } from 'lucide-react';
 
-export type TabId = 'dashboard' | 'mark' | 'students' | 'history' | 'weekly' | 'eligibility';
+export type TabId = 'dashboard' | 'mark' | 'students' | 'history' | 'weekly' | 'eligibility' | 'marks';
 
 interface NavigationTabsProps {
   activeTab: TabId;
@@ -19,6 +19,7 @@ const NavigationTabs = ({ activeTab, onTabChange }: NavigationTabsProps) => {
     { id: 'history', label: 'History', icon: <History className="w-4 h-4" /> },
     { id: 'weekly', label: 'Weekly View', icon: <CalendarDays className="w-4 h-4" /> },
     { id: 'eligibility', label: 'Eligibility', icon: <ShieldCheck className="w-4 h-4" /> },
+    { id: 'marks', label: 'Marks', icon: <FileText className="w-4 h-4" /> },
   ];
 
   const visibleTabs = tabs.filter(t => !t.facultyOnly || user?.role === 'faculty');

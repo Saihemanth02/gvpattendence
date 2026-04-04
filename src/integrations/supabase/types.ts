@@ -73,6 +73,42 @@ export type Database = {
         }
         Relationships: []
       }
+      marks: {
+        Row: {
+          created_at: string
+          id: string
+          internal: number | null
+          mid1: number | null
+          mid2: number | null
+          section: string
+          student_suffix: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          internal?: number | null
+          mid1?: number | null
+          mid2?: number | null
+          section?: string
+          student_suffix: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          internal?: number | null
+          mid1?: number | null
+          mid2?: number | null
+          section?: string
+          student_suffix?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

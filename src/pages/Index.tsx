@@ -14,6 +14,7 @@ import StudentsTab from '@/pages/StudentsTab';
 import HistoryTab from '@/pages/HistoryTab';
 import WeeklyViewTab from '@/pages/WeeklyViewTab';
 import EligibilityTab from '@/pages/EligibilityTab';
+import MarksTab from '@/pages/MarksTab';
 import StudentDashboard from '@/pages/StudentDashboard';
 
 const tabComponent: Record<TabId, React.FC> = {
@@ -23,6 +24,7 @@ const tabComponent: Record<TabId, React.FC> = {
   history: HistoryTab,
   weekly: WeeklyViewTab,
   eligibility: EligibilityTab,
+  marks: MarksTab,
 };
 
 const Index = () => {
@@ -49,7 +51,7 @@ const Index = () => {
 
   // Keyboard shortcuts: 1-6 to switch tabs
   useEffect(() => {
-    const tabOrder: TabId[] = ['dashboard', 'mark', 'students', 'history', 'weekly', 'eligibility'];
+    const tabOrder: TabId[] = ['dashboard', 'mark', 'students', 'history', 'weekly', 'eligibility', 'marks'];
     const tabLabels: Record<TabId, string> = {
       dashboard: 'Dashboard',
       mark: 'Mark Attendance',
@@ -57,11 +59,12 @@ const Index = () => {
       history: 'History',
       weekly: 'Weekly View',
       eligibility: 'Eligibility',
+      marks: 'Marks',
     };
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
       const num = parseInt(e.key);
-      if (num >= 1 && num <= 6) {
+      if (num >= 1 && num <= 7) {
         const tab = tabOrder[num - 1];
         if (tab) {
           handleTabChange(tab);

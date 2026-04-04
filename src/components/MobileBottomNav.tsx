@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, ClipboardCheck, Users, History, CalendarDays, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, ClipboardCheck, Users, History, CalendarDays, ShieldCheck, FileText } from 'lucide-react';
 import type { TabId } from '@/components/NavigationTabs';
 
 interface MobileBottomNavProps {
@@ -15,6 +15,7 @@ const tabs: { id: TabId; label: string; icon: React.ElementType; facultyOnly?: b
   { id: 'history', label: 'History', icon: History },
   { id: 'weekly', label: 'Weekly', icon: CalendarDays },
   { id: 'eligibility', label: 'Eligible', icon: ShieldCheck },
+  { id: 'marks', label: 'Marks', icon: FileText },
 ];
 
 const MobileBottomNav = ({ activeTab, onTabChange }: MobileBottomNavProps) => {
