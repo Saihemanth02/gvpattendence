@@ -118,14 +118,30 @@ const MarksTab = () => {
 
       {/* Subject Input & Actions */}
       <div className="glass-card p-4 flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+        <div className="relative flex items-center gap-2 flex-1 min-w-[200px]">
           <FileSpreadsheet className="w-4 h-4 text-primary" />
           <Input
             placeholder="Subject name (e.g., DBMS)"
             value={subject}
-            onChange={e => setSubject(e.target.value)}
+            onChange={e => { setSubject(e.target.value); setShowSuggestions(true); }}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
             className="h-9 text-sm"
           />
+          {showSuggestions && subjectSuggestions.length > 0 && (
+            <div className="absolute top-full left-6 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-lg border border-primary/20 bg-background shadow-lg">
+              {subjectSuggestions.map(s => (
+                <button
+                  key={s}
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-primary/10 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => { setSubject(s); setShowSuggestions(false); }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <input ref={fileRef} type="file" accept=".csv" onChange={handleCSV} className="hidden" />
         <Button
