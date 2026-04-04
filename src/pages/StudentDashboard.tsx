@@ -22,7 +22,7 @@ const StudentDashboard = () => {
   const { data: myMarks, isLoading: marksLoading } = useStudentMarks(user?.suffix);
   const [monthFilter, setMonthFilter] = useState<MonthFilter>('all');
 
-  const isLoading = recordsLoading || entriesLoading;
+  const isLoading = recordsLoading || entriesLoading || marksLoading;
   const suffix = user?.suffix;
 
   const now = new Date();

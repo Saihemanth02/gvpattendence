@@ -64,7 +64,7 @@ const Index = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
       const num = parseInt(e.key);
-      if (num >= 1 && num <= 6) {
+      if (num >= 1 && num <= 7) {
         const tab = tabOrder[num - 1];
         if (tab) {
           handleTabChange(tab);
