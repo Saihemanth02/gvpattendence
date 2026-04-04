@@ -29,9 +29,7 @@ const StatCard = ({ icon, label, value, iconBg, iconBorder }: StatCardProps) => 
   </div>
 );
 
-const DashboardTab = () => {
-  const [selectedSection, setSelectedSection] = useState<string>('all');
-  const { data: sections } = useSections();
+const DashboardTab = ({ selectedSection }: { selectedSection: string }) => {
   const { data: allStudents, isLoading: studentsLoading } = useStudents();
   const { data: records, isLoading: recordsLoading } = useAttendanceRecords();
   const recordIds = records?.map(r => r.id) || [];
