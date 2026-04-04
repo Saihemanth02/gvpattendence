@@ -1,5 +1,5 @@
 import { useAttendanceRecords, useAttendanceEntries, useDeleteAttendance } from '@/hooks/useAttendance';
-import { useStudents } from '@/hooks/useStudents';
+import { useStudents, COURSE_SECTIONS } from '@/hooks/useStudents';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, startOfMonth, endOfMonth, subMonths, isWithinInterval, parseISO } from 'date-fns';
 import { Trash2, Clock, CheckCircle, XCircle, ChevronLeft, ChevronRight, Download } from 'lucide-react';
@@ -18,6 +18,7 @@ const HistoryTab = () => {
   const { data: students } = useStudents();
   const deleteMutation = useDeleteAttendance();
   const [monthFilter, setMonthFilter] = useState<MonthFilter>('all');
+  const [sectionFilter, setSectionFilter] = useState<string>('');
 
   const now = new Date();
   const currentMonthStart = startOfMonth(now);
