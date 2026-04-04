@@ -8,9 +8,8 @@ import { CalendarDays, Clock } from 'lucide-react';
 
 const PERIODS = [1, 2, 3, 4, 5, 6, 7];
 
-const WeeklyViewTab = () => {
+const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: string }) => {
   const { data: records, isLoading } = useAttendanceRecords();
-  const [sectionFilter, setSectionFilter] = useState<string>('');
 
   const weekDays = useMemo(() => {
     const start = startOfWeek(new Date(), { weekStartsOn: 1 });

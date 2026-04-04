@@ -9,9 +9,9 @@ import { CalendarIcon, Send, CheckCircle, XCircle } from 'lucide-react';
 
 const PERIODS = [1, 2, 3, 4, 5, 6, 7];
 
-const MarkAttendanceTab = () => {
+const MarkAttendanceTab = ({ selectedSection }: { selectedSection: string }) => {
   const [subject, setSubject] = useState('');
-  const [section, setSection] = useState('');
+  const [section, setSection] = useState(selectedSection);
   const [date, setDate] = useState<Date>(new Date());
   const [period, setPeriod] = useState<number | null>(null);
   const [absentText, setAbsentText] = useState('');

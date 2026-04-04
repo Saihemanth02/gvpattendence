@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 
 type MonthFilter = 'all' | 'current' | 'previous';
 
-const HistoryTab = () => {
+const HistoryTab = ({ selectedSection: sectionFilter }: { selectedSection: string }) => {
   const { user } = useAuth();
   const { data: records, isLoading } = useAttendanceRecords();
   const recordIds = records?.map(r => r.id) || [];
@@ -18,7 +18,6 @@ const HistoryTab = () => {
   const { data: students } = useStudents();
   const deleteMutation = useDeleteAttendance();
   const [monthFilter, setMonthFilter] = useState<MonthFilter>('all');
-  const [sectionFilter, setSectionFilter] = useState<string>('');
 
   const now = new Date();
   const currentMonthStart = startOfMonth(now);

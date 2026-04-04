@@ -7,10 +7,10 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 
-const StudentsTab = () => {
+const StudentsTab = ({ selectedSection: globalSection }: { selectedSection: string }) => {
   const { user } = useAuth();
   const { data: sections } = useSections();
-  const [selectedSection, setSelectedSection] = useState<string>('');
+  const selectedSection = globalSection;
   const { data: students, isLoading: studentsLoading } = useStudents(selectedSection || undefined);
   const { data: records } = useAttendanceRecords();
   const recordIds = records?.map(r => r.id) || [];

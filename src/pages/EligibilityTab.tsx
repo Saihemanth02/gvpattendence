@@ -11,8 +11,7 @@ import { cn } from '@/lib/utils';
 const SUBJECT_THRESHOLD = 65;
 const OVERALL_THRESHOLD = 75;
 
-const EligibilityTab = () => {
-  const [sectionFilter, setSectionFilter] = useState<string>('');
+const EligibilityTab = ({ selectedSection: sectionFilter }: { selectedSection: string }) => {
   const { data: students } = useStudents(sectionFilter || undefined);
   const { data: records } = useAttendanceRecords();
   const recordIds = useMemo(() => records?.map(r => r.id), [records]);

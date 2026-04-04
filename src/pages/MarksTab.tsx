@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Upload, Trash2, Save, FileSpreadsheet, Plus } from 'lucide-react';
 
-const MarksTab = () => {
-  const [section, setSection] = useState('');
+const MarksTab = ({ selectedSection }: { selectedSection: string }) => {
+  const [section, setSection] = useState(selectedSection);
   const [subject, setSubject] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
