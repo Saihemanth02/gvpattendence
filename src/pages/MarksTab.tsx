@@ -176,7 +176,7 @@ const MarksTab = () => {
                   <th className="text-left py-2 px-2 text-xs font-cinzel text-muted-foreground">Name</th>
                   <th className="text-center py-2 px-2 text-xs font-cinzel text-muted-foreground">Mid-1 (20)</th>
                   <th className="text-center py-2 px-2 text-xs font-cinzel text-muted-foreground">Mid-2 (20)</th>
-                  <th className="text-center py-2 px-2 text-xs font-cinzel text-muted-foreground">Internal</th>
+                  <th className="text-center py-2 px-2 text-xs font-cinzel text-muted-foreground">AVERAGE</th>
                   <th className="text-center py-2 px-2 text-xs font-cinzel text-muted-foreground">Actions</th>
                 </tr>
               </thead>
