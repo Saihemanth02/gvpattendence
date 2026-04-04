@@ -163,6 +163,46 @@ const DashboardTab = () => {
           </div>
         )}
       </div>
+      {/* Marks Summary */}
+      {subjectMarksSummary.length > 0 && (
+        <div className="glass-card p-5 md:p-6">
+          <h3 className="font-cinzel text-[0.85rem] font-semibold text-primary tracking-[0.2em] mb-4 uppercase flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            Avg Internal Marks by Subject
+          </h3>
+          <div className="space-y-2.5">
+            {subjectMarksSummary.map(s => (
+              <div
+                key={`${s.subject}-${s.section}`}
+                className="flex items-center justify-between p-3 md:p-4 rounded-[10px] bg-card/70 border border-primary/10 hover:border-primary/30 transition-all duration-200"
+              >
+                <div>
+                  <p className="text-[0.95rem] font-semibold text-foreground">{s.subject}</p>
+                  <p className="text-[0.7rem] text-muted-foreground mt-0.5">{s.section} · {s.count} students</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-20 h-2 rounded-full bg-secondary overflow-hidden">
+                    <div
+                      className={cn(
+                        'h-full rounded-full transition-all',
+                        s.avg >= 10 ? 'bg-[hsl(150,50%,48%)]' : 'bg-destructive'
+                      )}
+                      style={{ width: `${(s.avg / 20) * 100}%` }}
+                    />
+                  </div>
+                  <span className={cn(
+                    'font-mono-num text-sm font-bold min-w-[3ch] text-right',
+                    s.avg >= 10 ? 'text-[hsl(150,50%,48%)]' : 'text-destructive'
+                  )}>
+                    {s.avg}
+                  </span>
+                  <span className="text-xs text-muted-foreground">/20</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
