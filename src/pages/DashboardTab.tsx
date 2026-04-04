@@ -34,8 +34,9 @@ const DashboardTab = () => {
   const { data: records, isLoading: recordsLoading } = useAttendanceRecords();
   const recordIds = records?.map(r => r.id) || [];
   const { data: entries } = useAttendanceEntries(recordIds);
+  const { data: allMarks, isLoading: marksLoading } = useMarks();
 
-  const isLoading = studentsLoading || recordsLoading;
+  const isLoading = studentsLoading || recordsLoading || marksLoading;
 
   const totalStudents = students?.length || 0;
   const classesHeld = records?.length || 0;
