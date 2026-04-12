@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSupabaseUser(null);
   }, []);
 
-  // Fixed 10-minute session timer — no reset on activity
+  // Fixed 10-minute session timer — only for students, not faculty
   useEffect(() => {
     if (!user) {
       clearTimeout(timeoutRef.current);
@@ -81,10 +81,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    // Faculty has no session timeout
+    if (user.role === 'faculty') {
+      clearTimeout(timeoutRef.current);
+      clearInterval(tickRef.current);
+      setSessionRemaining(-1); // -1 signals no timeout
+      return;
+    }
+
     deadlineRef.current = Date.now() + SESSION_TIMEOUT_MS;
     setSessionRemaining(SESSION_TIMEOUT_MS / 1000);
 
-    // Auto-logout after 10 minutes
     timeoutRef.current = setTimeout(() => {
       toast.error('Session expired', {
         description: 'You have been logged out. Please log in again.',
@@ -93,7 +100,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logout();
     }, SESSION_TIMEOUT_MS);
 
-    // Tick every second to update countdown
     tickRef.current = setInterval(() => {
       const remaining = Math.max(0, Math.round((deadlineRef.current - Date.now()) / 1000));
       setSessionRemaining(remaining);
