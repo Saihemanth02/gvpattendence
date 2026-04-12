@@ -71,8 +71,9 @@ export default {
       },
       fontFamily: {
         cinzel: ["Cinzel", "serif"],
-        cormorant: ["Cormorant Garamond", "serif"],
-        mono: ["DM Mono", "monospace"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        cormorant: ["Inter", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",
