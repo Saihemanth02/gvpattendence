@@ -1,29 +1,34 @@
 import { useAttendanceRecords } from '@/hooks/useAttendance';
-import { COURSE_SECTIONS } from '@/hooks/useStudents';
-import { startOfWeek, endOfWeek, eachDayOfInterval, format, isToday, isSameDay } from 'date-fns';
+import { startOfWeek, endOfWeek, eachDayOfInterval, format, isToday, addWeeks, subWeeks, startOfMonth, endOfMonth, isSameMonth } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMemo, useState } from 'react';
-import { CalendarDays, Clock } from 'lucide-react';
+import { CalendarDays, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PERIODS = [1, 2, 3, 4, 5, 6, 7];
 
 const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: string }) => {
   const { data: records, isLoading } = useAttendanceRecords();
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const weekDays = useMemo(() => {
-    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
-    const end = endOfWeek(new Date(), { weekStartsOn: 1 });
-    return eachDayOfInterval({ start, end }).slice(0, 5);
-  }, []);
+    const start = startOfWeek(currentDate, { weekStartsOn: 1 });
+    const end = endOfWeek(currentDate, { weekStartsOn: 1 });
+    return eachDayOfInterval({ start, end }).slice(0, 6); // Mon-Sat
+  }, [currentDate]);
 
   const filteredRecords = useMemo(() => {
-    if (!sectionFilter) return records;
-    return records?.filter(r => r.section === sectionFilter);
+    if (!records) return [];
+    let filtered = records;
+    if (sectionFilter && sectionFilter !== 'all') {
+      filtered = filtered.filter(r => r.section === sectionFilter);
+    }
+    return filtered;
   }, [records, sectionFilter]);
 
   const getRecord = (day: Date, period: number) => {
-    return filteredRecords?.find(r => isSameDay(new Date(r.date), day) && r.period === period);
+    const dayStr = format(day, 'yyyy-MM-dd');
+    return filteredRecords.find(r => r.date === dayStr && r.period === period);
   };
 
   const totalSlots = weekDays.length * PERIODS.length;
@@ -37,6 +42,41 @@ const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: st
     return count;
   }, [filteredRecords, weekDays]);
 
+  const goToday = () => setCurrentDate(new Date());
+  const goPrev = () => setCurrentDate(prev => subWeeks(prev, 1));
+  const goNext = () => setCurrentDate(prev => addWeeks(prev, 1));
+
+  const isCurrentWeek = useMemo(() => {
+    const now = new Date();
+    const thisStart = startOfWeek(now, { weekStartsOn: 1 });
+    const viewStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+    return format(thisStart, 'yyyy-MM-dd') === format(viewStart, 'yyyy-MM-dd');
+  }, [currentDate]);
+
+  // Month summary: count of classes per week in the current month
+  const monthWeeks = useMemo(() => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const weeks: { start: Date; end: Date; count: number }[] = [];
+    let weekStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+
+    while (weekStart <= monthEnd) {
+      const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+      const days = eachDayOfInterval({ start: weekStart, end: weekEnd }).slice(0, 6);
+      let count = 0;
+      days.forEach(day => {
+        if (isSameMonth(day, currentDate)) {
+          PERIODS.forEach(p => {
+            if (getRecord(day, p)) count++;
+          });
+        }
+      });
+      weeks.push({ start: weekStart, end: weekEnd, count });
+      weekStart = addWeeks(weekStart, 1);
+    }
+    return weeks;
+  }, [currentDate, filteredRecords]);
+
   if (isLoading) {
     return (
       <div className="p-4 md:p-6 space-y-4">
@@ -49,7 +89,7 @@ const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: st
   return (
     <div className="p-4 md:p-6 animate-fade-in-up space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
             <CalendarDays className="w-5 h-5 text-primary" />
@@ -58,22 +98,55 @@ const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: st
             <h2 className="font-cinzel text-xs tracking-[0.2em] text-primary font-semibold">
               WEEKLY VIEW
             </h2>
-            <p className="text-xs text-muted-foreground font-raleway">
-              {format(weekDays[0], 'dd MMM')} — {format(weekDays[4], 'dd MMM yyyy')}
+            <p className="text-xs text-muted-foreground">
+              {format(weekDays[0], 'dd MMM')} — {format(weekDays[weekDays.length - 1], 'dd MMM yyyy')}
             </p>
           </div>
         </div>
+
+        {/* Week Navigation */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={goPrev}
+            className="w-8 h-8 rounded-lg border border-primary/20 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={goToday}
+            disabled={isCurrentWeek}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-cinzel tracking-wider border transition-colors",
+              isCurrentWeek
+                ? "border-primary/30 bg-primary/10 text-primary cursor-default"
+                : "border-primary/20 text-muted-foreground hover:text-primary hover:border-primary/40"
+            )}
+          >
+            Today
+          </button>
+          <button
+            onClick={goNext}
+            className="w-8 h-8 rounded-lg border border-primary/20 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Month label + slots */}
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-cinzel text-muted-foreground tracking-[0.15em]">
+          {format(currentDate, 'MMMM yyyy').toUpperCase()}
+        </span>
         <div className="glass-card px-3 py-1.5 rounded-lg">
-          <span className="text-xs text-muted-foreground font-raleway">
+          <span className="text-xs text-muted-foreground">
             <span className="text-primary font-semibold">{filledSlots}</span> / {totalSlots} slots filled
           </span>
         </div>
       </div>
 
-
-
       {/* Legend */}
-      <div className="flex items-center gap-4 text-xs text-muted-foreground font-raleway">
+      <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_6px_hsl(var(--accent)/0.4)]" />
           <span>Class held</span>
@@ -126,7 +199,7 @@ const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: st
                       )}
                       <span>{format(day, 'EEE dd')}</span>
                       {isToday(day) && (
-                        <span className="text-[9px] text-primary/60 font-raleway tracking-wider">(TODAY)</span>
+                        <span className="text-[9px] text-primary/60 tracking-wider">(TODAY)</span>
                       )}
                     </div>
                   </td>
@@ -137,7 +210,7 @@ const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: st
                         {rec ? (
                           <div className="flex flex-col items-center gap-1 group cursor-default">
                             <div className="w-3.5 h-3.5 rounded-full bg-accent shadow-[0_0_8px_hsl(var(--accent)/0.4)] group-hover:shadow-[0_0_12px_hsl(var(--accent)/0.6)] transition-shadow" />
-                            <span className="text-[9px] text-foreground/70 font-raleway font-semibold tracking-wider">
+                            <span className="text-[9px] text-foreground/70 font-semibold tracking-wider">
                               {rec.subject.slice(0, 4).toUpperCase()}
                             </span>
                           </div>
@@ -155,7 +228,7 @@ const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: st
       </div>
 
       {/* Daily Summary */}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-6 gap-2">
         {weekDays.map(day => {
           const dayCount = PERIODS.filter(p => getRecord(day, p)).length;
           return (
@@ -175,10 +248,45 @@ const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: st
               )}>
                 {dayCount}
               </p>
-              <p className="text-[9px] text-muted-foreground font-raleway">classes</p>
+              <p className="text-[9px] text-muted-foreground">classes</p>
             </div>
           );
         })}
+      </div>
+
+      {/* Month Overview */}
+      <div className="glass-card rounded-xl p-4 space-y-3">
+        <h3 className="font-cinzel text-[0.65rem] tracking-[0.2em] text-muted-foreground uppercase">
+          {format(currentDate, 'MMMM')} Overview
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          {monthWeeks.map((w, i) => {
+            const isActive = format(w.start, 'yyyy-MM-dd') === format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+            return (
+              <button
+                key={i}
+                onClick={() => setCurrentDate(w.start)}
+                className={cn(
+                  "rounded-lg p-2.5 text-center border transition-all",
+                  isActive
+                    ? "border-primary/40 bg-primary/10"
+                    : "border-border/20 hover:border-primary/20 hover:bg-primary/5"
+                )}
+              >
+                <p className="text-[0.6rem] font-cinzel text-muted-foreground tracking-wider">
+                  {format(w.start, 'dd MMM')} – {format(w.end, 'dd')}
+                </p>
+                <p className={cn(
+                  "text-base font-cinzel font-bold mt-0.5",
+                  w.count > 0 ? "text-accent" : "text-muted-foreground/40"
+                )}>
+                  {w.count}
+                </p>
+                <p className="text-[8px] text-muted-foreground">classes</p>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
