@@ -54,17 +54,19 @@ const AppHeader = () => {
 
       {/* RIGHT */}
       <div className="flex items-center gap-1.5 md:gap-2">
-        {/* Session */}
-        <div
-          className={cn(
-            "px-2 py-1 rounded-md border text-[0.65rem] font-mono tabular-nums transition-all",
-            isUrgent
-              ? "border-destructive/50 bg-destructive/10 text-destructive animate-pulse"
-              : "border-border text-muted-foreground"
-          )}
-        >
-          {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-        </div>
+        {/* Session - hidden for faculty */}
+        {sessionRemaining >= 0 && (
+          <div
+            className={cn(
+              "px-2 py-1 rounded-md border text-[0.65rem] font-mono tabular-nums transition-all",
+              isUrgent
+                ? "border-destructive/50 bg-destructive/10 text-destructive animate-pulse"
+                : "border-border text-muted-foreground"
+            )}
+          >
+            {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+          </div>
+        )}
 
         {/* Theme */}
         <button
