@@ -25,14 +25,14 @@ const NavigationTabs = ({ activeTab, onTabChange }: NavigationTabsProps) => {
   const visibleTabs = tabs.filter(t => !t.facultyOnly || user?.role === 'faculty');
 
   return (
-    <nav className="bg-background/90 backdrop-blur-sm border-b-2 border-primary px-4 md:px-6 overflow-x-auto">
-      <div className="flex gap-1 py-1">
+    <nav className="bg-background/90 backdrop-blur-sm border-b-2 border-primary px-2 md:px-4 overflow-x-auto scrollbar-hide">
+      <div className="flex items-center justify-center gap-0.5 py-1.5">
         {visibleTabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              'flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-[0.8rem] font-cinzel transition-all whitespace-nowrap',
+              'flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-md text-[0.7rem] font-cinzel transition-all whitespace-nowrap',
               activeTab === tab.id
                 ? 'bg-gradient-to-br from-secondary to-primary/15 text-primary border border-primary/40 font-semibold shadow-[0_0_15px_hsla(42,88%,55%,0.08)]'
                 : 'text-muted-foreground hover:text-foreground hover:bg-secondary/40 border border-transparent'
