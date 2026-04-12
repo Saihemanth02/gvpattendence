@@ -232,72 +232,70 @@ const EligibilityTab = ({ selectedSection: sectionFilter }: { selectedSection: s
         {filtered.map(student => (
           <div
             key={student.id}
-            className="glass-card p-4 rounded-xl glass-card-hover transition-all duration-200"
+            className="glass-card px-4 py-2.5 rounded-lg glass-card-hover transition-all duration-200"
           >
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="font-cinzel font-semibold text-foreground text-sm">{student.name}</p>
-                <p className="text-[0.65rem] text-muted-foreground font-raleway tracking-wider">
-                  {student.reg_number} · Suffix: {student.suffix}
-                </p>
-              </div>
-              <Badge
-                variant={student.isEligible ? 'default' : 'destructive'}
-                className={cn(
-                  "flex items-center gap-1 font-cinzel text-[0.6rem] tracking-wider px-2.5 py-1",
-                  student.isEligible
-                    ? "bg-accent/20 text-accent border border-accent/30 hover:bg-accent/30"
-                    : "bg-destructive/20 text-destructive border border-destructive/30 hover:bg-destructive/30"
-                )}
-              >
-                {student.isEligible ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                {student.isEligible ? 'ELIGIBLE' : 'NOT ELIGIBLE'}
-              </Badge>
-            </div>
-
-            {/* Overall */}
-            <div className="flex items-center gap-2 mb-2.5">
-              <span className="text-[0.6rem] text-muted-foreground w-16 font-cinzel tracking-wider">OVERALL</span>
-              <div className="flex-1 h-2.5 bg-secondary/30 rounded-full overflow-hidden">
-                <div
-                  className={cn(
-                    "h-full rounded-full transition-all duration-500",
-                    student.overallMet ? "bg-accent shadow-[0_0_8px_hsl(var(--accent)/0.3)]" : "bg-destructive shadow-[0_0_8px_hsl(var(--destructive)/0.3)]"
-                  )}
-                  style={{ width: `${Math.min(student.overallPercent, 100)}%` }}
-                />
-              </div>
-              <span className={cn(
-                "text-xs font-bold w-14 text-right font-cinzel",
-                student.overallMet ? "text-accent" : "text-destructive"
-              )}>
-                {student.overallPercent.toFixed(1)}%
-              </span>
-            </div>
-
-            {/* Per Subject */}
-            <div className="space-y-1.5">
-              {student.subjects.map(sub => (
-                <div key={sub.name} className="flex items-center gap-2">
-                  <span className="text-[0.6rem] text-muted-foreground w-16 truncate font-raleway" title={sub.name}>
-                    {sub.name}
-                  </span>
-                  <div className="flex-1 h-1.5 bg-secondary/20 rounded-full overflow-hidden">
-                    <div
-                      className={cn(
-                        "h-full rounded-full transition-all duration-500",
-                        sub.meetsThreshold ? "bg-accent/70" : "bg-destructive/70"
-                      )}
-                      style={{ width: `${Math.min(sub.percent, 100)}%` }}
-                    />
-                  </div>
-                  <span className={cn(
-                    "text-[10px] font-medium w-14 text-right font-raleway",
-                    sub.meetsThreshold ? "text-accent" : "text-destructive"
-                  )}>
-                    {sub.present}/{sub.total} ({sub.percent.toFixed(0)}%)
-                  </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="min-w-0">
+                  <p className="font-cinzel font-semibold text-foreground text-xs truncate">{student.name}</p>
+                  <p className="text-[0.6rem] text-muted-foreground tracking-wider">
+                    {student.reg_number} · {student.suffix}
+                  </p>
                 </div>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                {/* Compact subject pills */}
+                <div className="hidden md:flex items-center gap-1.5">
+                  {student.subjects.map(sub => (
+                    <span
+                      key={sub.name}
+                      title={`${sub.name}: ${sub.present}/${sub.total} (${sub.percent.toFixed(0)}%)`}
+                      className={cn(
+                        "text-[0.55rem] px-1.5 py-0.5 rounded font-mono",
+                        sub.meetsThreshold
+                          ? "bg-accent/15 text-accent"
+                          : "bg-destructive/15 text-destructive"
+                      )}
+                    >
+                      {sub.name.slice(0, 4)} {sub.percent.toFixed(0)}%
+                    </span>
+                  ))}
+                </div>
+                {/* Overall percentage */}
+                <span className={cn(
+                  "text-xs font-bold font-mono",
+                  student.overallMet ? "text-accent" : "text-destructive"
+                )}>
+                  {student.overallPercent.toFixed(1)}%
+                </span>
+                <Badge
+                  variant={student.isEligible ? 'default' : 'destructive'}
+                  className={cn(
+                    "flex items-center gap-1 font-cinzel text-[0.55rem] tracking-wider px-2 py-0.5",
+                    student.isEligible
+                      ? "bg-accent/20 text-accent border border-accent/30 hover:bg-accent/30"
+                      : "bg-destructive/20 text-destructive border border-destructive/30 hover:bg-destructive/30"
+                  )}
+                >
+                  {student.isEligible ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                  {student.isEligible ? 'ELIGIBLE' : 'NOT ELIGIBLE'}
+                </Badge>
+              </div>
+            </div>
+            {/* Compact progress bar row - visible on mobile */}
+            <div className="md:hidden flex items-center gap-1.5 mt-1.5 flex-wrap">
+              {student.subjects.map(sub => (
+                <span
+                  key={sub.name}
+                  className={cn(
+                    "text-[0.5rem] px-1 py-0.5 rounded font-mono",
+                    sub.meetsThreshold
+                      ? "bg-accent/15 text-accent"
+                      : "bg-destructive/15 text-destructive"
+                  )}
+                >
+                  {sub.name.slice(0, 4)} {sub.percent.toFixed(0)}%
+                </span>
               ))}
             </div>
           </div>
