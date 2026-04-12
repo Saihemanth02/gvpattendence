@@ -14,7 +14,7 @@ const WeeklyViewTab = ({ selectedSection: sectionFilter }: { selectedSection: st
   const weekDays = useMemo(() => {
     const start = startOfWeek(currentDate, { weekStartsOn: 1 });
     const end = endOfWeek(currentDate, { weekStartsOn: 1 });
-    return eachDayOfInterval({ start, end }).slice(0, 6); // Mon-Sat
+    return eachDayOfInterval({ start, end }).slice(0, 5); // Mon-Fri
   }, [currentDate]);
 
   const filteredRecords = useMemo(() => {
