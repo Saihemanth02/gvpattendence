@@ -25,7 +25,7 @@ const NavigationTabs = ({ activeTab, onTabChange }: NavigationTabsProps) => {
   const visibleTabs = tabs.filter(t => !t.facultyOnly || user?.role === 'faculty');
 
   return (
-    <nav className="bg-background/80 backdrop-blur-sm border-b border-border px-2 md:px-4 overflow-x-auto scrollbar-hide">
+    <nav className="bg-background/80 backdrop-blur-sm border-b-2 border-primary/25 px-2 md:px-4 overflow-x-auto scrollbar-hide">
       <div className="flex items-center justify-center gap-0.5 py-1">
         {visibleTabs.map(tab => (
           <button

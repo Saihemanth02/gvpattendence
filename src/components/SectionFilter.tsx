@@ -14,7 +14,7 @@ const SectionFilter = ({ selectedSection, onSectionChange }: SectionFilterProps)
   ];
 
   return (
-    <div className="flex items-center justify-center gap-1 px-3 py-1 bg-background/60 backdrop-blur-sm border-b border-border overflow-x-auto scrollbar-hide">
+    <div className="flex items-center justify-center gap-1 px-3 py-1.5 bg-muted/30 backdrop-blur-sm border-b border-border overflow-x-auto scrollbar-hide">
       {allSections.map(sec => (
         <button
           key={sec.value}
