@@ -134,7 +134,8 @@ serve(async (req) => {
     }
 
     // Faculty
-    await seedUser("admin@gvp.faculty", "admin123", "admin", "Admin Faculty", "faculty");
+    const facultyPassword = Deno.env.get("FACULTY_PASSWORD") ?? "admin123";
+    await seedUser("admin@gvp.faculty", facultyPassword, "admin", "Admin Faculty", "faculty");
 
     // Students - process in batches of 10 to avoid timeout
     for (let i = 0; i < STUDENTS.length; i += 5) {
